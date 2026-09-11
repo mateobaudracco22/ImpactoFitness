@@ -1,14 +1,21 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import login from './src/paginas/login.jsx'
-import './App.css'
+import React from "react";
+import Inicio from "./paginas/inicio";
+import Login from "/.paginas/login";
+import Registro from "./paginas/registro";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 function App() {
   return (
-    <login/>
+    <>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/inico" element={<Inico />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/registro-alumnos" element={<Registro />} />
+        </Routes>
+      </BrowserRouter>
+    </>
   );
 }
 
-export default App
+export default App;
