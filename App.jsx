@@ -1,7 +1,7 @@
 import React from "react";
-import Inicio from "./paginas/inicio";
+//import Inicio from "./paginas/inicio";
 import Login from "/.paginas/login";
-import Registro from "./paginas/registro";
+//import Registro from "./paginas/registro";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 function App() {
