@@ -1,4 +1,4 @@
-function Login() {
+function login() {
     return (
         <div>
             <h1>Iniciar Sesión</h1>
