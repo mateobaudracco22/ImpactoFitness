@@ -1,20 +1,17 @@
 import React from "react";
-//import Inicio from "./paginas/inicio";
-import Login from "/.paginas/login";
-//import Registro from "./paginas/registro";
+import Login from "./paginas/login.jsx";
+import Informacion from "./paginas/informacion.jsx";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 function App() {
   return (
-    <>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/inico" element={<Inico />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/registro-alumnos" element={<Registro />} />
-        </Routes>
-      </BrowserRouter>
-    </>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/informacion" element={<Informacion />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
