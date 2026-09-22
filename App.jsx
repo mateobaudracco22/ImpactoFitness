@@ -1,6 +1,6 @@
 import Login from "./src/paginas/login.jsx";
 import Informacion from "./src/paginas/informacion.jsx";
-import Instructor from "./src/paginas/Instructor.jsx";  
+import Instructor from "./src/paginas/instructor.jsx";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 function App() {
