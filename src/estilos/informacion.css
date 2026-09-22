@@ -40,7 +40,7 @@
 
 .info .caja {
     width: 300px;
-    min-height: 230px;
+    height: 400px;
     background-color: #2A2A2A;
     padding: 25px;
     border: 2px solid #FF5722;
