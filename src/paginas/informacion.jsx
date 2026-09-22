@@ -12,7 +12,7 @@ function Info() {
 
             <main className="contenedor">
 
-                <div className="Info">
+                <div className="info">
                     <h2>¿Quiénes somos?</h2>
                     <p>
                         En Impacto-Fitness buscamos facilitar la tarea de entrenar
@@ -21,7 +21,7 @@ function Info() {
                     </p>
                 </div>
 
-                <div className="Info">
+                <div className="info">
                     <h2>¿Qué ofrecemos?</h2>
                     <p>
                         Nuestra plataforma permite acceder a diferentes servicios
@@ -36,7 +36,7 @@ function Info() {
                     </ul>
                 </div>
 
-                <div className="Info">
+                <div className="info">
                     <h2>Rutinas</h2>
                     <p>
                         Los usuarios pueden consultar diferentes rutinas dependiendo
@@ -45,7 +45,7 @@ function Info() {
                     </p>
                 </div>
 
-                <div className="Info">
+                <div className="info">
                     <h2>Reservas</h2>
                     <p>
                         Desde la plataforma se pueden realizar reservas para
@@ -54,7 +54,7 @@ function Info() {
                     </p>
                 </div>
 
-                <div className="Info">
+                <div className="info">
                     <h2>Horarios</h2>
                     <p>
                         El gimnasio cuenta con diferentes horarios para que cada
@@ -63,7 +63,7 @@ function Info() {
                     </p>
                 </div>
 
-                <div className="Info">
+                <div className="info">
                     <h2>Contacto</h2>
                     <p>
                         Para realizar consultas o recibir más información,
