@@ -1,6 +1,5 @@
-import React from "react";
-import Login from "./paginas/login.jsx";
-import Informacion from "./paginas/informacion.jsx";
+import Login from "./src/paginas/login.jsx";
+import Informacion from "./src/paginas/informacion.jsx";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 function App() {
