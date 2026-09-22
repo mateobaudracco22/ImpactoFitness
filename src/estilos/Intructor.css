@@ -1,0 +1,138 @@
+/* Paleta de colores del gimnasio */
+:root {
+  --bg-principal: #121212;
+  --bg-secundario: #2a2a2a;
+  --acento-principal: #ff5722;
+  --tono-medio: #ff9800;
+  --detalle-brillo: #ffb74d;
+  --texto-blanco: #ffffff;
+  --texto-gris: #b0b0b0;
+}
+
+/* Contenedor principal de toda la página */
+.instructor-container {
+  background-color: var(--bg-principal);
+  color: var(--texto-blanco);
+  min-height: 100vh;
+  padding: 40px 20px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+/* Ancho máximo del contenido para mantenerlo centrado */
+.instructor-content {
+  width: 100%;
+  max-width: 700px;
+}
+
+/* Tarjeta del Encabezado */
+.header-card {
+  background-color: var(--bg-secundario);
+  border-radius: 12px;
+  padding: 24px 30px;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  margin-bottom: 35px;
+  overflow: hidden;
+}
+
+/* Borde acentuado curvo en el lado izquierdo */
+.header-card::before {
+  content: "";
+  position: absolute;
+  top: 15px;
+  bottom: 15px;
+  left: 10px;
+  width: 5px;
+  background-color: var(--acento-principal);
+  border-radius: 10px;
+}
+
+.header-title {
+  color: var(--detalle-brillo);
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+}
+
+.header-subtitle {
+  color: var(--texto-gris);
+  font-size: 15px;
+  margin: 0;
+}
+
+/* Título de la sección */
+.section-title {
+  color: var(--tono-medio);
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+/* Lista de tarjetas de alumnos */
+.alumnos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Tarjeta individual de alumno */
+.alumno-card {
+  background-color: var(--bg-secundario);
+  border-radius: 10px;
+  padding: 20px 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.alumno-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+.alumno-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.alumno-nombre {
+  color: var(--texto-blanco);
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.alumno-rutina {
+  color: var(--texto-gris);
+  font-size: 14px;
+  margin: 0;
+}
+
+/* Botón Ver Rutina */
+.btn-ver-rutina {
+  background-color: var(--acento-principal);
+  color: var(--texto-blanco);
+  border: none;
+  border-radius: 8px;
+  padding: 10px 22px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.btn-ver-rutina:hover {
+  background-color: #e04818;
+}
+
+.btn-ver-rutina:active {
+  transform: scale(0.97);
+}
