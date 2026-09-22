@@ -1,3 +1,5 @@
+Import React from "react";
+
 function login() {
     return (
         <div>
@@ -7,7 +9,7 @@ function login() {
                 <input type="text"/>
                 <label>Usuario</label>
                 <input type="text" />
-                <label>Email</label>
+            <label>Email</label>
                 <input type="email" />
                 <label>Contraseña</label>
                 <input type="password" />
