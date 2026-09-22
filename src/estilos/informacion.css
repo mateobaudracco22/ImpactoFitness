@@ -2,7 +2,7 @@
     box-sizing: border-box;
 }
 
-.info-page { 
+.info { 
     font-family: Arial, sans-serif;
     background-color: #121212;
     color: white;
@@ -11,24 +11,24 @@
     min-height: 100vh;
 }
 
-.info-page header {
+.info header {
     background-color: #2A2A2A;
     text-align: center;
     padding: 30px;
     border-bottom: 3px solid #FF5722;
 }
 
-.info-page header h1 {
+.info header h1 {
     margin: 0;
     color: white;
 }
 
-.info-page header h2 {
+.info header h2 {
     margin-top: 10px;
     color: #FF9800;
 }
 
-.info-page .contenedor {
+.info .contenedor {
     width: 90%;
     max-width: 1100px;
     margin: 40px auto;
@@ -38,9 +38,9 @@
     gap: 25px;
 }
 
-.info-page .caja {
+.info .caja {
     width: 300px;
-    min-height: 230px;
+    height: 400px;
     background-color: #2A2A2A;
     padding: 25px;
     border: 2px solid #FF5722;
@@ -49,34 +49,34 @@
     transition: 0.3s;
 }
 
-.info-page .caja:hover {
+.info .caja:hover {
     transform: translateY(-8px);
     border-color: #FFB74D;
     box-shadow: 0 0 20px rgba(255, 152, 0, 0.5);
 }
 
-.info-page .caja h2 {
+.info .caja h2 {
     color: #FF9800;
     margin-top: 0;
     margin-bottom: 15px;
 }
 
-.info-page .caja p {
+.info .caja p {
     color: #eeeeee;
     line-height: 1.6;
 }
 
-.info-page .caja ul {
+.info .caja ul {
     padding-left: 20px;
     color: #eeeeee;
     line-height: 1.8;
 }
 
-.info-page .caja li::marker {
+.info .caja li::marker {
     color: #FFB74D;
 }
 
-.info-page footer {
+.info footer {
     background-color: #2A2A2A;
     color: #eeeeee;
     text-align: center;
@@ -84,20 +84,20 @@
     border-top: 2px solid #FF5722;
 }
 
-.info-page footer p {
+.info footer p {
     margin: 0;
 }
 
 @media (max-width: 700px) {
-    .info-page .contenedor {
+    .info .contenedor {
         width: 95%;
     }
 
-    .info-page .caja {
+    .info .caja {
         width: 100%;
     }
 
-    .info-page header h1 {
+    .info header h1 {
         font-size: 26px;
     }
 }

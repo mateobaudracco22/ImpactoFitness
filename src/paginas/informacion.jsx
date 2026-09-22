@@ -1,8 +1,9 @@
+import React from "react";
 import "../estilos/informacion.css";
 
 function Info() {
     return (
-        <div>
+        <div className="info">
 
             <header>
                 <h1>Información sobre este gimnasio</h1>
