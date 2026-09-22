@@ -1,4 +1,5 @@
-import "../estilos/informacion.css";
+import React from "react";
+import "../estilos/Informacion.css";
 
 function Info() {
     return (
