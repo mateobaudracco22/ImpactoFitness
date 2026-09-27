@@ -73,3 +73,11 @@
     letter-spacing: 0.5px;
     transition: background-color 0.3s ease, transform 0.1s ease;
 }
+
+.formulario-login button:hover {
+    background-color: #FF9800;
+}
+
+.formulario-login button:active {
+    transform: scale(0.98);
+}
