@@ -24,3 +24,21 @@
     text-transform: uppercase;
     letter-spacing: 1px;
 }
+
+.formulario-login {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.campo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.campo label {
+    font-size: 0.9rem;
+    color: #FFB74D;
+    font-weight: 600;
+}
