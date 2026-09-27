@@ -1,6 +1,6 @@
-Import React from "react";
+import React from "react";
 
-function login() {
+function Login() {
     return (
     <div className="contenedor-login">
      <div className="tarjeta-login">
@@ -34,4 +34,4 @@ function login() {
     );
 }
 
-export default login;
+export default Login;
