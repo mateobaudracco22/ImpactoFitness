@@ -71,11 +71,12 @@
     cursor: pointer;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    transition: background-color 0.3s ease, transform 0.1s ease;
+    transition: background-color 0.3s ease, transform 1s ease;
 }
 
 .formulario-login button:hover {
     background-color: #FF9800;
+    transform: scale(1.01);
 }
 
 .formulario-login button:active {
