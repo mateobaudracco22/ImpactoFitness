@@ -78,7 +78,6 @@
   color: var(--texto-gris);
 }
 
-/* 🌟 RELEVANTE: Estilo del buscador de alumnos */
 .section-header {
   display: flex;
   justify-content: space-between;
@@ -108,4 +107,77 @@
 
 .search-input:focus {
   border-color: var(--acento-principal);
+}
+/* Tarjetas de Alumnos y Ejercicios */
+.alumnos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.alumno-card {
+  background-color: var(--bg-secundario);
+  border-radius: 8px;
+  padding: 18px 22px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--borde-tarjeta);
+}
+
+.alumno-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.alumno-avatar {
+  width: 44px;
+  height: 44px;
+  background-color: var(--acento-principal);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 18px;
+  color: var(--texto-blanco);
+  flex-shrink: 0;
+}
+
+.alumno-header-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.alumno-nombre {
+  margin: 0;
+  font-size: 18px;
+  color: var(--texto-blanco);
+}
+
+.alumno-rutina {
+  margin: 4px 0 0 0;
+  font-size: 14px;
+  color: var(--texto-gris);
+}
+
+.badge {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.badge-success {
+  background-color: rgba(76, 175, 80, 0.2);
+  color: #81c784;
+}
+
+.badge-warning {
+  background-color: rgba(255, 152, 0, 0.2);
+  color: var(--tono-medio);
 }
