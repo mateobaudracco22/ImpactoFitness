@@ -1,3 +1,8 @@
+/* RESET BÁSICO PARA EVITAR DESBORDAMIENTOS */
+* {
+    box-sizing: border-box;
+}
+
 .contenedor-login {
     display: flex;
     justify-content: center;
@@ -44,6 +49,7 @@
 }
 
 .campo input {
+    width: 100%;
     padding: 0.75rem;
     border-radius: 6px;
     border: 1px solid #3A3A3A;
@@ -59,35 +65,44 @@
     box-shadow: 0 0 5px rgba(255, 152, 0, 0.4);
 }
 
-.formulario-login button {
-    margin-top: 0.5rem;
-    padding: 0.8rem;
-    background-color: #FF5722;
-    color: #FFFFFF;
+/* INPUT DE CONTRASEÑA CON OJO */
+.contenedor-input-password {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.contenedor-input-password input {
+    padding-right: 2.8rem; /* Espacio interno para que el ícono no pise el texto */
+}
+
+/* BOTÓN DEL OJO (Anulamos los estilos de botón genérico) */
+.formulario-login button.boton-ojo {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
     border: none;
-    border-radius: 6px;
-    font-size: 1rem;
-    font-weight: bold;
+    padding: 0;
+    margin: 0;
     cursor: pointer;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    transition: background-color 0.3s ease, transform 1s ease;
+    font-size: 1.2rem;
+    line-height: 1;
+    box-shadow: none;
 }
 
-.formulario-login button:hover {
-    background-color: #FF9800;
-    transform: scale(1.01);
+.formulario-login button.boton-ojo:hover {
+    background: transparent;
+    transform: translateY(-50%) scale(1.1); /* Efecto zoom suave en el ojo */
 }
 
-.formulario-login button:active {
-    transform: scale(0.98);
-}
-
-/* Botón principal de ingresar */
+/* BOTÓN PRINCIPAL DE INGRESAR */
 .boton-ingresar {
     margin-top: 0.5rem;
     padding: 0.8rem;
-    background-color: #FF5722; /* Acento principal */
+    background-color: #FF5722;
     color: #FFFFFF;
     border: none;
     border-radius: 6px;
@@ -101,14 +116,14 @@
 
 .boton-ingresar:hover {
     background-color: #FF9800;
-    transform: scale(1.03); /* Se agranda un poco al pasar el cursor */
+    transform: scale(1.03);
 }
 
 .boton-ingresar:active {
     transform: scale(0.98);
 }
 
-/* Sección Crear Cuenta */
+/* SECCIÓN CREAR CUENTA */
 .seccion-registro {
     margin-top: 2rem;
     padding-top: 1.5rem;
@@ -125,11 +140,11 @@
     margin: 0;
 }
 
-/* Botón secundario para registrarse */
+/* BOTÓN SECUNDARIO CREAR CUENTA */
 .boton-crear-cuenta {
     padding: 0.7rem;
     background-color: transparent;
-    color: #FFB74D; /* Tono de detalle/brillo */
+    color: #FFB74D;
     border: 2px solid #FFB74D;
     border-radius: 6px;
     font-size: 0.95rem;
