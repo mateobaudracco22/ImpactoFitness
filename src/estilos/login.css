@@ -1,0 +1,164 @@
+* {
+    box-sizing: border-box;
+}
+
+.contenedor-login {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #121212;
+}
+
+.tarjeta-login {
+    background-color: #2A2A2A;
+    padding: 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+    width: 100%;
+    max-width: 380px;
+    border-top: 4px solid #FF5722;
+}
+
+.titulo-login {
+    text-align: center;
+    color: #FFFFFF;
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.formulario-login {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.campo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.campo label {
+    font-size: 0.9rem;
+    color: #FFB74D;
+    font-weight: 600;
+}
+
+.campo input {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 6px;
+    border: 1px solid #3A3A3A;
+    background-color: #121212;
+    color: #FFFFFF;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.campo input:focus {
+    border-color: #FF9800;
+    box-shadow: 0 0 5px rgba(255, 152, 0, 0.4);
+}
+
+/* INPUT DE CONTRASEÑA CON OJO */
+.contenedor-input-password {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.contenedor-input-password input {
+    padding-right: 2.8rem;
+}
+
+.boton-ojo {
+    position: absolute !important;
+    right: 10px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    cursor: pointer !important;
+    font-size: 1.2rem !important;
+    line-height: 1 !important;
+    box-shadow: none !important;
+    width: auto !important;
+}
+
+.boton-ojo:hover {
+    background: transparent !important;
+    transform: translateY(-50%) scale(1.1) !important;
+}
+
+/* BOTÓN PRINCIPAL DE INGRESAR */
+.boton-ingresar {
+    margin-top: 0.5rem;
+    padding: 0.8rem;
+    background-color: #FF5722;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.boton-ingresar:hover {
+    background-color: #FF9800;
+    transform: scale(1.03);
+}
+
+.boton-ingresar:active {
+    transform: scale(0.98);
+}
+
+/* SECCIÓN CREAR CUENTA */
+.seccion-registro {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #3A3A3A;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.seccion-registro p {
+    color: #CCCCCC;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+/* BOTÓN SECUNDARIO CREAR CUENTA */
+.boton-crear-cuenta {
+    padding: 0.7rem;
+    background-color: transparent;
+    color: #FFB74D;
+    border: 2px solid #FFB74D;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: bold;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+.boton-crear-cuenta:hover {
+    background-color: #FFB74D;
+    color: #121212;
+    transform: scale(1.03);
+}
+
+.boton-crear-cuenta:active {
+    transform: scale(0.98);
+}
