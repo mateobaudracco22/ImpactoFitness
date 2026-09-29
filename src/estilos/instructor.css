@@ -49,3 +49,63 @@
   margin: 0;
   font-size: 14px;
 }
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.metric-card {
+  background-color: var(--bg-secundario);
+  border-radius: 8px;
+  padding: 15px;
+  text-align: center;
+  border-bottom: 3px solid var(--acento-principal);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.metric-number {
+  display: block;
+  font-size: 26px;
+  font-weight: bold;
+  color: var(--detalle-brillo);
+  margin-bottom: 4px;
+}
+
+.metric-label {
+  font-size: 13px;
+  color: var(--texto-gris);
+}
+
+/* 🌟 RELEVANTE: Estilo del buscador de alumnos */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.section-title {
+  color: var(--tono-medio);
+  font-size: 22px;
+  margin: 0;
+  font-weight: 600;
+}
+
+.search-input {
+  background-color: var(--bg-secundario);
+  border: 1px solid var(--borde-tarjeta);
+  border-radius: 6px;
+  padding: 8px 14px;
+  color: var(--texto-blanco);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.search-input:focus {
+  border-color: var(--acento-principal);
+}
