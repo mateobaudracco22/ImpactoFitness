@@ -28,20 +28,32 @@ function Login() {
           <div className="campo">
             <label>Contraseña</label>
             <div className="contenedor-input-password">
-              <input type={mostrarPassword ? "text" : "password"} placeholder="••••••••"/>
-              <button type="submit" className="boton-ingresar">Ingresar</button>
-              <button type="button" className="boton-ojo" onClick={() => setMostrarPassword(!mostrarPassword)}> {mostrarPassword ? "🙈" : "👁️"}
-</button>
+              <input
+                type={mostrarPassword ? "text" : "password"}
+                placeholder="••••••••"
+              />
+              <button
+                type="button"
+                className="boton-ojo"
+                onClick={() => setMostrarPassword(!mostrarPassword)}
+              >
+                {mostrarPassword ? "🙈" : "👁️"}
+              </button>
             </div>
           </div>
 
-          <div className="seccion-registro">
-            <p>¿No tienes una cuenta?</p>
-            <button type="button" className="boton-crear-cuenta">
-              Crear Cuenta
-            </button>
-          </div>
+          <button type="submit" className="boton-ingresar">
+            Ingresar
+          </button>
         </form>
+
+        <div className="seccion-registro">
+          <p>¿No tienes una cuenta?</p>
+          <button type="button" className="boton-crear-cuenta">
+            Crear Cuenta
+          </button>
+        </div>
+
       </div>
     </div>
   );

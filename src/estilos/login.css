@@ -1,4 +1,3 @@
-/* RESET BÁSICO PARA EVITAR DESBORDAMIENTOS */
 * {
     box-sizing: border-box;
 }
@@ -74,28 +73,28 @@
 }
 
 .contenedor-input-password input {
-    padding-right: 2.8rem; /* Espacio interno para que el ícono no pise el texto */
+    padding-right: 2.8rem;
 }
 
-/* BOTÓN DEL OJO (Anulamos los estilos de botón genérico) */
-.formulario-login button.boton-ojo {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: transparent;
-    border: none;
-    padding: 0;
-    margin: 0;
-    cursor: pointer;
-    font-size: 1.2rem;
-    line-height: 1;
-    box-shadow: none;
+.boton-ojo {
+    position: absolute !important;
+    right: 10px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    cursor: pointer !important;
+    font-size: 1.2rem !important;
+    line-height: 1 !important;
+    box-shadow: none !important;
+    width: auto !important;
 }
 
-.formulario-login button.boton-ojo:hover {
-    background: transparent;
-    transform: translateY(-50%) scale(1.1); /* Efecto zoom suave en el ojo */
+.boton-ojo:hover {
+    background: transparent !important;
+    transform: translateY(-50%) scale(1.1) !important;
 }
 
 /* BOTÓN PRINCIPAL DE INGRESAR */
