@@ -8,3 +8,44 @@
   --texto-gris: #b0b0b0;
   --borde-tarjeta: #3a3a3a;
 }
+/* Estilos Generales y Contenedores */
+.instructor-container {
+  background-color: var(--bg-principal);
+  color: var(--texto-blanco);
+  min-height: 100vh;
+  padding: 40px 20px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+.instructor-content {
+  width: 100%;
+  max-width: 750px;
+}
+
+/* Tarjeta del Encabezado */
+.header-card {
+  background-color: var(--bg-secundario);
+  border-left: 6px solid var(--acento-principal);
+  padding: 25px;
+  border-radius: 8px;
+  text-align: center;
+  margin-bottom: 25px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.header-title {
+  color: var(--detalle-brillo);
+  margin: 0 0 8px 0;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.header-subtitle {
+  color: var(--texto-gris);
+  margin: 0;
+  font-size: 14px;
+}
