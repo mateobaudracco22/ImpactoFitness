@@ -181,3 +181,54 @@
   background-color: rgba(255, 152, 0, 0.2);
   color: var(--tono-medio);
 }
+.btn-ver-rutina {
+  background-color: var(--acento-principal);
+  color: var(--texto-blanco);
+  border: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.btn-ver-rutina:hover {
+  background-color: var(--tono-medio);
+  transform: translateY(-2px);
+}
+
+.btn-volver {
+  background-color: transparent;
+  color: var(--detalle-brillo);
+  border: 1px solid var(--detalle-brillo);
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-bottom: 20px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-volver:hover {
+  background-color: var(--detalle-brillo);
+  color: var(--bg-principal);
+}
+
+/* Detalle de Ejercicios */
+.ejercicio-titulo {
+  color: var(--acento-principal);
+  margin: 0 0 6px 0;
+  font-size: 18px;
+}
+
+.ejercicio-series {
+  margin: 0;
+  color: var(--texto-blanco);
+  font-weight: 500;
+}
+
+.ejercicio-desc {
+  color: var(--texto-gris);
+  font-size: 13px;
+}
