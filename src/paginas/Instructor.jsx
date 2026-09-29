@@ -50,4 +50,37 @@ function Instructor() {
               onChange={(e) => setBusqueda(e.target.value)}
             />
           </div>
-          
+          <div className="alumnos-list">
+            {alumnosFiltrados.map((alumno) => (
+              <div key={alumno.id} className="alumno-card">
+                <div className="alumno-left">
+                  {/* 🌟 RELEVANTE: Avatar automático tomando la primera letra del nombre */}
+                  <div className="alumno-avatar">{alumno.nombre.charAt(0)}</div>
+                  <div>
+                    <div className="alumno-header-info">
+                      <h3 className="alumno-nombre">{alumno.nombre}</h3>
+                      {/* 🌟 RELEVANTE: El color de la etiqueta cambia según el estado del alumno */}
+                      <span className={`badge ${alumno.estado === "Al día" ? "badge-success" : "badge-warning"}`}>
+                        {alumno.estado}
+                      </span>
+                    </div>
+                    <p className="alumno-rutina">{alumno.enfoque}</p>
+                  </div>
+                </div>
+                {/* 🌟 RELEVANTE: Al hacer clic, navega a la URL con la categoría de rutina correspondiente */}
+                <button
+                  className="btn-ver-rutina"
+                  onClick={() => navigate(`/rutina/${alumno.categoria}`)}
+                >
+                  Ver Rutina
+                </button>
+              </div>
+            ))}
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}
+
+export default Instructor;
