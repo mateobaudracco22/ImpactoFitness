@@ -1,4 +1,4 @@
-import "../estilos/PechoYBiceps";
+import "../estilos/PechoYBiceps.css";
 
 function Rutina() {
     return (
