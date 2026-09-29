@@ -30,6 +30,12 @@ function Login() {
 
         <button type="submit">Ingresar</button>
        </form>
+
+       <div className="seccion-registro">
+                    <p>¿No tienes una cuenta?</p>
+                    <button type="button" className="boton-crear-cuenta">Crear Cuenta</button>
+                </div>
+                
      </div>
     </div>
     );
