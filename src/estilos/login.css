@@ -82,3 +82,69 @@
 .formulario-login button:active {
     transform: scale(0.98);
 }
+
+/* Botón principal de ingresar */
+.boton-ingresar {
+    margin-top: 0.5rem;
+    padding: 0.8rem;
+    background-color: #FF5722; /* Acento principal */
+    color: #FFFFFF;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.boton-ingresar:hover {
+    background-color: #FF9800;
+    transform: scale(1.03); /* Se agranda un poco al pasar el cursor */
+}
+
+.boton-ingresar:active {
+    transform: scale(0.98);
+}
+
+/* Sección Crear Cuenta */
+.seccion-registro {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #3A3A3A;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.seccion-registro p {
+    color: #CCCCCC;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+/* Botón secundario para registrarse */
+.boton-crear-cuenta {
+    padding: 0.7rem;
+    background-color: transparent;
+    color: #FFB74D; /* Tono de detalle/brillo */
+    border: 2px solid #FFB74D;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: bold;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+.boton-crear-cuenta:hover {
+    background-color: #FFB74D;
+    color: #121212;
+    transform: scale(1.03);
+}
+
+.boton-crear-cuenta:active {
+    transform: scale(0.98);
+}
