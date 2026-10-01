@@ -3,16 +3,20 @@ import mysql from 'mysql2/promise';
 import cors from 'cors';
 
 const app = express();
-app.use(cors());
-app.use(express.json());
-
 const PORT = 3000;
 
+// --- MIDDLEWARES ---
+app.use(cors()); // Comunicación de Frontend y Backend en diferentes puertos
+app.use(express.json()); // Recibir datos en formato JSON desde el Frontend
+
+// Configuración de conexión a MySQL
 const dbConfig = {
     host: 'localhost',
     user: 'root',
-    password: '' // Tu contraseña de MySQL
+    password: ''
 };
+
+let db; // Variable global para reutilizar la conexión en los endpoints
 
 async function inicializarBaseDeDatos() {
     try {
@@ -22,7 +26,7 @@ async function inicializarBaseDeDatos() {
         await conexion.query(`CREATE DATABASE IF NOT EXISTS impacto_fitness;`);
         await conexion.query(`USE impacto_fitness;`);
 
-        // 2. Tabla Usuarios
+        // 2. Crear tablas si no existen
         await conexion.query(`
             CREATE TABLE IF NOT EXISTS Usuarios (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -35,7 +39,6 @@ async function inicializarBaseDeDatos() {
             );
         `);
 
-        // 3. Tabla Ejercicios
         await conexion.query(`
             CREATE TABLE IF NOT EXISTS Ejercicios (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -45,7 +48,6 @@ async function inicializarBaseDeDatos() {
             );
         `);
 
-        // 4. Tabla Etiquetas_Musculares
         await conexion.query(`
             CREATE TABLE IF NOT EXISTS Etiquetas_Musculares (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -53,7 +55,6 @@ async function inicializarBaseDeDatos() {
             );
         `);
 
-        // 5. Tabla Intermedia Ejercicio_Etiqueta
         await conexion.query(`
             CREATE TABLE IF NOT EXISTS Ejercicio_Etiqueta (
                 ejercicio_id INT,
@@ -64,7 +65,6 @@ async function inicializarBaseDeDatos() {
             );
         `);
 
-        // 6. Tabla Rutinas
         await conexion.query(`
             CREATE TABLE IF NOT EXISTS Rutinas (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -78,7 +78,6 @@ async function inicializarBaseDeDatos() {
             );
         `);
 
-        // 7. Tabla Intermedia Rutina_Ejercicios (Detalle de ejercicios en cada rutina)
         await conexion.query(`
             CREATE TABLE IF NOT EXISTS Rutina_Ejercicios (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -92,7 +91,6 @@ async function inicializarBaseDeDatos() {
             );
         `);
 
-        // 8. Tabla Solicitudes_Rutina
         await conexion.query(`
             CREATE TABLE IF NOT EXISTS Solicitudes_Rutina (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -104,21 +102,169 @@ async function inicializarBaseDeDatos() {
             );
         `);
 
-        console.log('✅ Base de datos "impacto_fitness" y las 7 tablas creadas correctamente.');
+        console.log('✅ Base de datos "impacto_fitness" y 7 tablas verificadas/creadas.');
         return conexion;
     } catch (error) {
         console.error('❌ Error al inicializar la base de datos:', error.message);
     }
 }
 
-// Inicializar base de datos y arrancar servidor
-inicializarBaseDeDatos().then((db) => {
-    
-    app.get('/api/estado', (req, res) => {
-        res.json({ mensaje: 'Servidor funcionando con la estructura completa de tablas' });
-    });
+// --- ENDPOINTS (API) ---
 
-    app.listen(PORT, () => {
-        console.log(`Servidor Backend corriendo en http://localhost:${PORT}`);
-    });
+// 1. ESTADO DEL SERVIDOR
+app.get('/api/estado', (req, res) => {
+    res.json({ mensaje: 'El servidor de Impacto Fitness está funcionando' });
+});
+
+// 2. USUARIOS (Registro y Login)
+app.post('/api/registro', async (req, res) => {
+    const { nombre_completo, email, telefono, objetivo, password, rol } = req.body;
+    try {
+        const [resultado] = await db.query(
+            `INSERT INTO Usuarios (nombre_completo, email, telefono, objetivo, password_hash, rol) 
+             VALUES (?, ?, ?, ?, ?, ?)`,
+            [nombre_completo, email, telefono, objetivo, password, rol || 'cliente']
+        );
+        res.status(201).json({ mensaje: 'Usuario registrado con éxito', usuarioId: resultado.insertId });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.post('/api/login', async (req, res) => {
+    const { email, password } = req.body;
+    try {
+        const [usuarios] = await db.query(
+            "SELECT id, nombre_completo, email, rol, objetivo FROM Usuarios WHERE email = ? AND password_hash = ?",
+            [email, password]
+        );
+
+        if (usuarios.length === 0) {
+            return res.status(401).json({ error: 'Credenciales inválidas' });
+        }
+
+        res.json({ usuario: usuarios[0] });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// 3. EJERCICIOS Y ETIQUETAS MUSCULARES
+app.get('/api/ejercicios', async (req, res) => {
+    try {
+        const [ejercicios] = await db.query("SELECT * FROM Ejercicios");
+        res.json(ejercicios);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.get('/api/etiquetas', async (req, res) => {
+    try {
+        const [etiquetas] = await db.query("SELECT * FROM Etiquetas_Musculares");
+        res.json(etiquetas);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.post('/api/ejercicios', async (req, res) => {
+    const { nombre, descripcion, url_gif_demostrativo } = req.body;
+    try {
+        const [resultado] = await db.query(
+            "INSERT INTO Ejercicios (nombre, descripcion, url_gif_demostrativo) VALUES (?, ?, ?)",
+            [nombre, descripcion, url_gif_demostrativo]
+        );
+        res.status(201).json({ mensaje: 'Ejercicio creado', id: resultado.insertId });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// 4. SOLICITUDES DE RUTINA (Para que los clientes pidan rutinas)
+app.post('/api/solicitudes', async (req, res) => {
+    const { usuario_id, proposito_solicitado, ejercicios_no_aptos } = req.body;
+    try {
+        const [resultado] = await db.query(
+            "INSERT INTO Solicitudes_Rutina (usuario_id, proposito_solicitado, ejercicios_no_aptos) VALUES (?, ?, ?)",
+            [usuario_id, proposito_solicitado, ejercicios_no_aptos]
+        );
+        res.status(201).json({ mensaje: 'Solicitud enviada al entrenador', id: resultado.insertId });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.get('/api/solicitudes', async (req, res) => {
+    try {
+        // Trae las solicitudes junto con el nombre del alumno que la pidió
+        const [solicitudes] = await db.query(`
+            SELECT s.*, u.nombre_completo, u.email 
+            FROM Solicitudes_Rutina s 
+            JOIN Usuarios u ON s.usuario_id = u.id 
+            WHERE s.estado = 'Pendiente'
+        `);
+        res.json(solicitudes);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// 5. RUTINAS Y RUTINA_EJERCICIOS (Para asignar y consultar rutinas)
+app.get('/api/rutinas/usuario/:usuario_id', async (req, res) => {
+    const { usuario_id } = req.params;
+    try {
+        // Obtener las rutinas del usuario con sus ejercicios, series y repeticiones
+        const [rutinas] = await db.query(`
+            SELECT r.id AS rutina_id, r.nombre_rutina, r.proposito, r.dia_asignado,
+                   re.series, re.repeticiones, re.orden,
+                   e.nombre AS nombre_ejercicio, e.descripcion, e.url_gif_demostrativo
+            FROM Rutinas r
+            LEFT JOIN Rutina_Ejercicios re ON r.id = re.rutina_id
+            LEFT JOIN Ejercicios e ON re.ejercicio_id = e.id
+            WHERE r.usuario_id = ?
+            ORDER BY r.dia_asignado, re.orden
+        `, [usuario_id]);
+
+        res.json(rutinas);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.post('/api/rutinas', async (req, res) => {
+    const { usuario_id, instructor_id, nombre_rutina, proposito, dia_asignado, ejercicios } = req.body;
+    try {
+        // 1. Crear la rutina principal
+        const [resultadoRutina] = await db.query(
+            "INSERT INTO Rutinas (usuario_id, instructor_id, nombre_rutina, proposito, dia_asignado) VALUES (?, ?, ?, ?, ?)",
+            [usuario_id, instructor_id, nombre_rutina, proposito, dia_asignado]
+        );
+        const rutinaId = resultadoRutina.insertId;
+
+        // 2. Insertar cada ejercicio asignado a esa rutina en la tabla Rutina_Ejercicios
+        if (ejercicios && ejercicios.length > 0) {
+            for (let i = 0; i < ejercicios.length; i++) {
+                const ej = ejercicios[i];
+                await db.query(
+                    "INSERT INTO Rutina_Ejercicios (rutina_id, ejercicio_id, series, repeticiones, orden) VALUES (?, ?, ?, ?, ?)",
+                    [rutinaId, ej.ejercicio_id, ej.series, ej.repeticiones, i + 1]
+                );
+            }
+        }
+
+        res.status(201).json({ mensaje: 'Rutina creada con éxito', rutinaId });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// --- ARRANCAR EL SERVIDOR ---
+inicializarBaseDeDatos().then((conexion) => {
+    if (conexion) {
+        db = conexion; // Guardamos la conexión activa para usarla en las rutas
+        app.listen(PORT, () => {
+            console.log(`🚀 Servidor Backend corriendo en http://localhost:${PORT}`);
+        });
+    }
 });
