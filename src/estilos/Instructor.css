@@ -1,4 +1,3 @@
-/* Paleta de colores del gimnasio */
 :root {
   --bg-principal: #121212;
   --bg-secundario: #2a2a2a;
@@ -7,9 +6,9 @@
   --detalle-brillo: #ffb74d;
   --texto-blanco: #ffffff;
   --texto-gris: #b0b0b0;
+  --borde-tarjeta: #3a3a3a;
 }
-
-/* Contenedor principal de toda la página */
+/* Estilos Generales y Contenedores */
 .instructor-container {
   background-color: var(--bg-principal);
   color: var(--texto-blanco);
@@ -22,117 +21,214 @@
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
 }
 
-/* Ancho máximo del contenido para mantenerlo centrado */
 .instructor-content {
   width: 100%;
-  max-width: 700px;
+  max-width: 750px;
 }
 
 /* Tarjeta del Encabezado */
 .header-card {
   background-color: var(--bg-secundario);
-  border-radius: 12px;
-  padding: 24px 30px;
+  border-left: 6px solid var(--acento-principal);
+  padding: 25px;
+  border-radius: 8px;
   text-align: center;
-  position: relative;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-  margin-bottom: 35px;
-  overflow: hidden;
-}
-
-/* Borde acentuado curvo en el lado izquierdo */
-.header-card::before {
-  content: "";
-  position: absolute;
-  top: 15px;
-  bottom: 15px;
-  left: 10px;
-  width: 5px;
-  background-color: var(--acento-principal);
-  border-radius: 10px;
+  margin-bottom: 25px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .header-title {
   color: var(--detalle-brillo);
+  margin: 0 0 8px 0;
   font-size: 28px;
   font-weight: 700;
-  margin: 0 0 8px 0;
 }
 
 .header-subtitle {
   color: var(--texto-gris);
-  font-size: 15px;
   margin: 0;
+  font-size: 14px;
+}
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+  margin-bottom: 30px;
 }
 
-/* Título de la sección */
-.section-title {
-  color: var(--tono-medio);
-  font-size: 22px;
-  font-weight: 700;
-  margin-bottom: 20px;
-}
-
-/* Lista de tarjetas de alumnos */
-.alumnos-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-/* Tarjeta individual de alumno */
-.alumno-card {
+.metric-card {
   background-color: var(--bg-secundario);
-  border-radius: 10px;
-  padding: 20px 25px;
+  border-radius: 8px;
+  padding: 15px;
+  text-align: center;
+  border-bottom: 3px solid var(--acento-principal);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.metric-number {
+  display: block;
+  font-size: 26px;
+  font-weight: bold;
+  color: var(--detalle-brillo);
+  margin-bottom: 4px;
+}
+
+.metric-label {
+  font-size: 13px;
+  color: var(--texto-gris);
+}
+
+.section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
-.alumno-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+.section-title {
+  color: var(--tono-medio);
+  font-size: 22px;
+  margin: 0;
+  font-weight: 600;
 }
 
-.alumno-info {
+.search-input {
+  background-color: var(--bg-secundario);
+  border: 1px solid var(--borde-tarjeta);
+  border-radius: 6px;
+  padding: 8px 14px;
+  color: var(--texto-blanco);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.search-input:focus {
+  border-color: var(--acento-principal);
+}
+/* Tarjetas de Alumnos y Ejercicios */
+.alumnos-list {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 15px;
+}
+
+.alumno-card {
+  background-color: var(--bg-secundario);
+  border-radius: 8px;
+  padding: 18px 22px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--borde-tarjeta);
+}
+
+.alumno-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.alumno-avatar {
+  width: 44px;
+  height: 44px;
+  background-color: var(--acento-principal);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 18px;
+  color: var(--texto-blanco);
+  flex-shrink: 0;
+}
+
+.alumno-header-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .alumno-nombre {
-  color: var(--texto-blanco);
-  font-size: 18px;
-  font-weight: 600;
   margin: 0;
+  font-size: 18px;
+  color: var(--texto-blanco);
 }
 
 .alumno-rutina {
-  color: var(--texto-gris);
+  margin: 4px 0 0 0;
   font-size: 14px;
-  margin: 0;
+  color: var(--texto-gris);
 }
 
-/* Botón Ver Rutina */
+.badge {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.badge-success {
+  background-color: rgba(76, 175, 80, 0.2);
+  color: #81c784;
+}
+
+.badge-warning {
+  background-color: rgba(255, 152, 0, 0.2);
+  color: var(--tono-medio);
+}
 .btn-ver-rutina {
   background-color: var(--acento-principal);
   color: var(--texto-blanco);
   border: none;
-  border-radius: 8px;
-  padding: 10px 22px;
-  font-size: 15px;
+  padding: 10px 18px;
+  border-radius: 6px;
   font-weight: 600;
+  font-size: 14px;
   cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.1s ease;
+  transition: transform 0.2s ease, background-color 0.2s ease;
 }
 
 .btn-ver-rutina:hover {
-  background-color: #e04818;
+  background-color: var(--tono-medio);
+  transform: translateY(-2px);
 }
 
-.btn-ver-rutina:active {
-  transform: scale(0.97);
+.btn-volver {
+  background-color: transparent;
+  color: var(--detalle-brillo);
+  border: 1px solid var(--detalle-brillo);
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-bottom: 20px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-volver:hover {
+  background-color: var(--detalle-brillo);
+  color: var(--bg-principal);
+}
+
+/* Detalle de Ejercicios */
+.ejercicio-titulo {
+  color: var(--acento-principal);
+  margin: 0 0 6px 0;
+  font-size: 18px;
+}
+
+.ejercicio-series {
+  margin: 0;
+  color: var(--texto-blanco);
+  font-weight: 500;
+}
+
+.ejercicio-desc {
+  color: var(--texto-gris);
+  font-size: 13px;
 }
