@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom"; // 1. Importamos la navegación
 import "../estilos/login.css";
 
 function Login({ onLoginExitoso }) {
@@ -6,6 +7,8 @@ function Login({ onLoginExitoso }) {
   const [password, setPassword] = useState("");
   const [mostrarPassword, setMostrarPassword] = useState(false);
   const [error, setError] = useState("");
+
+  const navigate = useNavigate(); // 2. Inicializamos el hook de navegación
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,7 +30,6 @@ function Login({ onLoginExitoso }) {
         return;
       }
 
-      // Guardamos la sesión en el navegador (incluye id, nombre, email y rol)
       localStorage.setItem("usuario", JSON.stringify(datos.usuario));
 
       if (onLoginExitoso) {
@@ -84,7 +86,11 @@ function Login({ onLoginExitoso }) {
 
         <div className="seccion-registro">
           <p>¿No tienes una cuenta?</p>
-          <button type="button" className="boton-crear-cuenta">
+          <button 
+            type="button" 
+            className="boton-crear-cuenta" 
+            onClick={() => navigate("/crear.cuenta")} // 3. Ruta corregida (sin el punto inicial)
+          >
             Crear Cuenta
           </button>
         </div>
