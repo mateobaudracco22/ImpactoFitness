@@ -1,31 +1,74 @@
 import React, { useState } from "react";
-import "../estilos/login.css"; // o el estilo que uses
+import { useNavigate } from "react-router-dom";
+import "../estilos/login.css";
 
 function CrearCuenta() {
   const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
+  const [telefono, setTelefono] = useState("");
+  const [objetivo, setObjetivo] = useState("musculacion/fuerza");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [cargando, setCargando] = useState(false);
 
-  const handleSubmit = (e) => {
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Aquí irá la lógica de registro con la API
+    setError("");
+    setCargando(true);
+
+    try {
+      const respuesta = await fetch("http://localhost:3000/api/registro", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          nombre_completo: nombre,
+          email,
+          telefono,
+          objetivo,
+          password,
+          rol: "cliente", // Todo usuario registrado desde la web inicia como cliente
+        }),
+      });
+
+      const datos = await respuesta.json();
+
+      if (!respuesta.ok) {
+        setError(datos.error || "Ocurrió un error al registrar la cuenta.");
+        setCargando(false);
+        return;
+      }
+
+      alert("¡Cuenta creada exitosamente! Ahora puedes iniciar sesión.");
+      navigate("/login");
+    } catch (err) {
+      setError("No se pudo conectar con el servidor. Verifica que esté encendido.");
+      setCargando(false);
+    }
   };
 
   return (
     <div className="contenedor-login">
       <div className="tarjeta-login">
         <h1 className="titulo-login">Crear Cuenta</h1>
+
+        {error && <p className="mensaje-error">{error}</p>}
+
         <form className="formulario-login" onSubmit={handleSubmit}>
           <div className="campo">
             <label>Nombre Completo</label>
             <input 
               type="text" 
-              placeholder="Tu nombre" 
+              placeholder="Tu nombre y apellido" 
               value={nombre} 
               onChange={(e) => setNombre(e.target.value)} 
               required 
             />
           </div>
+
           <div className="campo">
             <label>Email</label>
             <input 
@@ -36,6 +79,30 @@ function CrearCuenta() {
               required 
             />
           </div>
+
+          <div className="campo">
+            <label>Teléfono</label>
+            <input 
+              type="tel" 
+              placeholder="1122334455" 
+              value={telefono} 
+              onChange={(e) => setTelefono(e.target.value)} 
+            />
+          </div>
+
+          <div className="campo">
+            <label>Objetivo</label>
+            <select 
+              value={objetivo} 
+              onChange={(e) => setObjetivo(e.target.value)}
+              className="campo-input"
+            >
+              <option value="musculacion/fuerza">Musculación / Fuerza</option>
+              <option value="cardio/perdida_peso">Cardio / Pérdida de Peso</option>
+              <option value="clases/funcional">Clases / Funcional</option>
+            </select>
+          </div>
+
           <div className="campo">
             <label>Contraseña</label>
             <input 
@@ -46,10 +113,22 @@ function CrearCuenta() {
               required 
             />
           </div>
-          <button type="submit" className="boton-ingresar">
-            Registrarse
+
+          <button type="submit" className="boton-ingresar" disabled={cargando}>
+            {cargando ? "Registrando..." : "Registrarse"}
           </button>
         </form>
+
+        <div className="seccion-registro">
+          <p>¿Ya tienes una cuenta?</p>
+          <button 
+            type="button" 
+            className="boton-crear-cuenta"
+            onClick={() => navigate("/login")}
+          >
+            Iniciar Sesión
+          </button>
+        </div>
       </div>
     </div>
   );
