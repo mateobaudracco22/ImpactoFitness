@@ -1,28 +1,60 @@
 import React, { useState } from "react";
 import "../estilos/login.css";
 
-function Login() {
+function Login({ onLoginExitoso }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [mostrarPassword, setMostrarPassword] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    try {
+      const respuesta = await fetch("http://localhost:3000/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const datos = await respuesta.json();
+
+      if (!respuesta.ok) {
+        setError(datos.error || "Credenciales inválidas");
+        return;
+      }
+
+      // Guardamos la sesión en el navegador (incluye id, nombre, email y rol)
+      localStorage.setItem("usuario", JSON.stringify(datos.usuario));
+
+      if (onLoginExitoso) {
+        onLoginExitoso(datos.usuario);
+      }
+    } catch (err) {
+      setError("No se pudo conectar con el servidor. Verifica que esté encendido.");
+    }
+  };
 
   return (
     <div className="contenedor-login">
       <div className="tarjeta-login">
         <h1 className="titulo-login">Iniciar Sesión</h1>
 
-        <form className="formulario-login">
-          <div className="campo">
-            <label>Nombre y Apellido</label>
-            <input type="text" placeholder="Ingresa tu nombre" />
-          </div>
+        {error && <p className="mensaje-error">{error}</p>}
 
-          <div className="campo">
-            <label>Usuario</label>
-            <input type="text" placeholder="Ingresa tu usuario" />
-          </div>
-
+        <form className="formulario-login" onSubmit={handleSubmit}>
           <div className="campo">
             <label>Email</label>
-            <input type="email" placeholder="correo@ejemplo.com" />
+            <input
+              type="email"
+              placeholder="correo@ejemplo.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
           </div>
 
           <div className="campo">
@@ -31,6 +63,9 @@ function Login() {
               <input
                 type={mostrarPassword ? "text" : "password"}
                 placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
               />
               <button
                 type="button"
@@ -53,7 +88,6 @@ function Login() {
             Crear Cuenta
           </button>
         </div>
-
       </div>
     </div>
   );
