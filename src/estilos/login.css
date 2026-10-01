@@ -162,3 +162,15 @@
 .boton-crear-cuenta:active {
     transform: scale(0.98);
 }
+
+/* MENSAJE DE ERROR */
+.mensaje-error {
+    background-color: rgba(244, 67, 54, 0.15);
+    color: #FF5252;
+    border: 1px solid #FF5252;
+    padding: 0.6rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    text-align: center;
+    margin-bottom: 1rem;
+}
