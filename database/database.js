@@ -259,6 +259,63 @@ app.post('/api/rutinas', async (req, res) => {
     }
 });
 
+// 6. ELIMINAR RUTINA DE UN USUARIO (DELETE)
+app.delete('/api/rutinas/usuario/:usuario_id', async (req, res) => {
+  const { usuario_id } = req.params;
+
+  try {
+    // 1. Buscar la rutina asociada al usuario
+    const [rutinas] = await db.query('SELECT id FROM Rutinas WHERE usuario_id = ?', [usuario_id]);
+
+    if (rutinas.length === 0) {
+      return res.status(404).json({ mensaje: 'No se encontró rutina para este alumno.' });
+    }
+
+    const rutinaId = rutinas[0].id;
+
+    // 2. Borrar los ejercicios asociados a la rutina
+    await db.query('DELETE FROM Rutina_Ejercicios WHERE rutina_id = ?', [rutinaId]);
+
+    // 3. Borrar la cabecera de la rutina
+    await db.query('DELETE FROM Rutinas WHERE id = ?', [rutinaId]);
+
+    res.json({ mensaje: 'Rutina eliminada correctamente' });
+  } catch (error) {
+    console.error('Error al borrar la rutina:', error);
+    res.status(500).json({ error: 'Error al borrar la rutina en la base de datos.' });
+  }
+});
+
+// 7. ACTUALIZAR/EDITAR RUTINA (PUT)
+
+app.put('/api/rutinas/:id', async (req, res) => {
+  const { id } = req.params;
+  const { nombre_rutina, dia_asignado, ejercicios } = req.body;
+
+  try {
+    // 1. Actualizar datos de la rutina principal
+    await db.query(
+      'UPDATE Rutinas SET nombre_rutina = ?, dia_asignado = ? WHERE id = ?',
+      [nombre_rutina, dia_asignado, id]
+    );
+
+    // 2. Reemplazar ejercicios
+    await db.query('DELETE FROM Rutina_Ejercicios WHERE rutina_id = ?', [id]);
+
+    for (const ej of ejercicios) {
+      await db.query(
+        'INSERT INTO Rutina_Ejercicios (rutina_id, ejercicio_id, series, repeticiones) VALUES (?, ?, ?, ?)',
+        [id, ej.ejercicio_id, ej.series, ej.repeticiones]
+      );
+    }
+
+    res.json({ mensaje: 'Rutina actualizada correctamente' });
+  } catch (error) {
+    console.error('Error al actualizar la rutina:', error);
+    res.status(500).json({ error: 'Error al actualizar la rutina.' });
+  }
+});
+
 // --- ARRANCAR EL SERVIDOR ---
 inicializarBaseDeDatos().then((conexion) => {
     if (conexion) {
