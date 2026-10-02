@@ -240,6 +240,10 @@ function Instructor() {
     }, {});
   };
 
+  const alumnosFiltrados = alumnos.filter((a) =>
+    a.nombre.toLowerCase().includes(busqueda.toLowerCase())
+  );
+
   return (
     <div className="instructor-container">
       {/* BOTÓN FLOTANTE IZQUIERDO PARA ABRIR MENÚ DE ALUMNOS SIN ASIGNAR */}
@@ -307,6 +311,20 @@ function Instructor() {
             {instructor ? `Bienvenido/a, ${instructor.nombre_completo}` : "Gestión de alumnos y rutinas"}
           </p>
         </header>
+        <section className="metrics-grid">
+          <div className="metric-card">
+            <span className="metric-number">15</span>
+            <span className="metric-label">Alumnos Activos</span>
+          </div>
+          <div className="metric-card">
+            <span className="metric-number">7</span>
+            <span className="metric-label">Rutinas Hoy</span>
+          </div>
+          <div className="metric-card">
+            <span className="metric-number">3</span>
+            <span className="metric-label">Pendientes</span>
+          </div>
+        </section>
 
         <main>
           {cargando && <p className="texto-secundario">Cargando datos...</p>}

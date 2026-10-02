@@ -1,4 +1,4 @@
-import Login from "./src/paginas/login.jsx";
+import Login from "/src/paginas/login.jsx";
 import Informacion from "./src/paginas/informacion.jsx";
 import Instructor from "./src/paginas/instructor.jsx";
 import CrearCuenta from "./src/paginas/crear.cuenta.jsx"; // <-- Agregado
