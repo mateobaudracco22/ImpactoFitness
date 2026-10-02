@@ -78,7 +78,7 @@ function Instructor() {
       if (respuesta.ok) {
         alert("¡Alumno asignado correctamente a tu lista!");
         cargarDatos(instructor.id);
-        setMenuLateralAbierto(false); // Cierra el menú al tomar un alumno
+        setMenuLateralAbierto(false);
       } else {
         alert(datos.mensaje || datos.error || "No se pudo asignar el alumno.");
       }
@@ -240,13 +240,9 @@ function Instructor() {
     }, {});
   };
 
-  const alumnosFiltrados = alumnos.filter((a) =>
-    a.nombre.toLowerCase().includes(busqueda.toLowerCase())
-  );
-
   return (
     <div className="instructor-container">
-      {/* BOTÓN FLOTANTE IZQUIERDO PARA ABRIR MENÚ DE ALUMNOS SIN ASIGNAR */}
+      {/* BOTÓN FLOTANTE IZQUIERDO */}
       <button 
         type="button"
         className="btn-flotante-izquierda"
@@ -256,7 +252,7 @@ function Instructor() {
         📌 <span className="badge-contador">{alumnosLibres.length}</span>
       </button>
 
-      {/* MENÚ LATERAL DESPLEGABLE (SIDE DRAWER) */}
+      {/* MENÚ LATERAL DESPLEGABLE */}
       {menuLateralAbierto && (
         <div className="drawer-overlay" onClick={() => setMenuLateralAbierto(false)}>
           <div className="drawer-contenido" onClick={(e) => e.stopPropagation()}>
@@ -313,15 +309,11 @@ function Instructor() {
         </header>
         <section className="metrics-grid">
           <div className="metric-card">
-            <span className="metric-number">15</span>
-            <span className="metric-label">Alumnos Activos</span>
+            <span className="metric-number">{misAlumnos.length}</span>
+            <span className="metric-label">Mis Alumnos</span>
           </div>
           <div className="metric-card">
-            <span className="metric-number">7</span>
-            <span className="metric-label">Rutinas Hoy</span>
-          </div>
-          <div className="metric-card">
-            <span className="metric-number">3</span>
+            <span className="metric-number">{alumnosLibres.length}</span>
             <span className="metric-label">Pendientes</span>
           </div>
         </section>
@@ -330,7 +322,6 @@ function Instructor() {
           {cargando && <p className="texto-secundario">Cargando datos...</p>}
           {error && <p className="mensaje-error">{error}</p>}
 
-          {/* VISTA PRINCIPAL: MIS ALUMNOS ASIGNADOS */}
           <h2 className="section-title">🏋️ Mis Alumnos Asignados</h2>
           <div className="alumnos-list">
             {misAlumnos.length === 0 ? (
@@ -344,7 +335,7 @@ function Instructor() {
                       <h3 className="alumno-nombre">{alumno.nombre_completo}</h3>
                       <p className="alumno-rutina"><strong>Objetivo:</strong> {alumno.proposito_solicitado || alumno.objetivo}</p>
                       {alumno.ejercicios_no_aptos && (
-                        <p className="alumno-limitacion">⚠️ Limitación: {alumno.ejercicios_no_aptos}</p>
+                        <p className="alumno-limitacion">⚠️️ Limitación: {alumno.ejercicios_no_aptos}</p>
                       )}
                     </div>
                     <div className="contenedor-botones-card">
@@ -372,7 +363,6 @@ function Instructor() {
             )}
           </div>
 
-          {/* MODAL / VENTANA EMERGENTE: ARMAR O EDITAR RUTINA */}
           {solicitudSeleccionada && (
             <div className="modal-overlay" onClick={resetearFormulario}>
               <div className="tarjeta-formulario modal-contenido" onClick={(e) => e.stopPropagation()}>
@@ -491,7 +481,6 @@ function Instructor() {
             </div>
           )}
 
-          {/* MODAL / VENTANA EMERGENTE: VER RUTINAS */}
           {verRutinaModal && (
             <div className="modal-overlay" onClick={() => setVerRutinaModal(null)}>
               <div className="tarjeta-formulario modal-contenido" onClick={(e) => e.stopPropagation()}>
