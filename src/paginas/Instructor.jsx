@@ -47,7 +47,6 @@ function Instructor() {
       const datosSolicitudes = await resSolicitudes.json();
       const datosEjercicios = await resEjercicios.json();
 
-      // Separar los que no tienen instructor y los que son de este profesor
       const libres = datosSolicitudes.filter(s => !s.instructor_id);
       const asignados = datosSolicitudes.filter(s => Number(s.instructor_id) === Number(instructorId));
 
@@ -61,7 +60,6 @@ function Instructor() {
     }
   };
 
-  // Función para tomar al alumno
   const tomarAlumno = async (usuarioId) => {
     if (!instructor) {
       alert("No se encontró una sesión activa de instructor.");
@@ -80,17 +78,15 @@ function Instructor() {
       if (respuesta.ok) {
         alert("¡Alumno asignado correctamente a tu lista!");
         cargarDatos(instructor.id);
-        // Opcional: te redirige automáticamente a la lista de "Mis Alumnos"
         setPestanaActiva("misAlumnos");
       } else {
         alert(datos.mensaje || datos.error || "No se pudo asignar el alumno.");
       }
     } catch (err) {
-      alert("Error al conectar con el servidor. Verifica que tu servidor database.js tenga agregada la ruta PUT /api/alumnos/:id/asignar y lo hayas reiniciado.");
+      alert("Error al conectar con el servidor.");
     }
   };
 
-  // Obtener la rutina actual del alumno
   const consultarRutinaAlumno = async (usuarioId, nombreAlumno) => {
     setCargandoRutina(true);
     setVerRutinaModal({ usuarioId, nombreAlumno });
@@ -105,50 +101,42 @@ function Instructor() {
     }
   };
 
-  // Cargar datos de la rutina en el formulario para editar
-  const prepararEdicion = async (usuarioId, nombreAlumno) => {
-    try {
-      const res = await fetch(`http://localhost:3000/api/rutinas/usuario/${usuarioId}`);
-      const datos = await res.json();
+  // Prepara la edición de UNA rutina específica seleccionada
+  const prepararEdicion = (grupoRutina, nombreAlumno) => {
+    setEsEdicion(true);
+    setIdRutinaAEditar(grupoRutina.rutina_id);
+    setNombreRutina(grupoRutina.nombre_rutina);
+    setDiaAsignado(grupoRutina.dia_asignado);
 
-      if (!datos || datos.length === 0) {
-        alert("Este alumno aún no tiene una rutina asignada para editar.");
-        return;
-      }
-
-      const primeraFila = datos[0];
-      setEsEdicion(true);
-      setIdRutinaAEditar(primeraFila.rutina_id || primeraFila.id);
-      setNombreRutina(primeraFila.nombre_rutina || `Rutina de ${nombreAlumno}`);
-      setDiaAsignado(primeraFila.dia_asignado || "Lunes");
-
-      const ejerciciosFormateados = datos.map((item) => ({
+    const ejerciciosFormateados = grupoRutina.ejercicios
+      .filter(item => item.nombre_ejercicio)
+      .map((item) => ({
         ejercicio_id: item.ejercicio_id,
         series: item.series,
         repeticiones: item.repeticiones
       }));
 
-      setEjerciciosSeleccionados(ejerciciosFormateados);
-      setSolicitudSeleccionada({ usuario_id: usuarioId, nombre_completo: nombreAlumno });
-      setVerRutinaModal(null);
-    } catch (err) {
-      alert("Error al preparar la edición de la rutina.");
-    }
+    setEjerciciosSeleccionados(ejerciciosFormateados);
+    setSolicitudSeleccionada({ usuario_id: verRutinaModal.usuarioId, nombre_completo: nombreAlumno });
+    setVerRutinaModal(null);
   };
 
-  const eliminarRutina = async (usuarioId, nombreAlumno) => {
-    const confirmar = window.confirm(`¿Estás seguro de que deseas borrar la rutina asignada a ${nombreAlumno}?`);
+  // Elimina UNA rutina específica seleccionada por su rutina_id
+  const eliminarRutinaEspecifica = async (rutinaId, tituloRutina) => {
+    const confirmar = window.confirm(`¿Estás seguro de que deseas borrar la rutina "${tituloRutina}"?`);
     if (!confirmar) return;
 
     try {
-      const respuesta = await fetch(`http://localhost:3000/api/rutinas/usuario/${usuarioId}`, {
+      const respuesta = await fetch(`http://localhost:3000/api/rutinas/${rutinaId}`, {
         method: "DELETE"
       });
 
       if (respuesta.ok) {
         alert("¡Rutina eliminada con éxito!");
-        setVerRutinaModal(null);
-        setRutinaAlumno([]);
+        // Re-consultar las rutinas restantes del alumno
+        if (verRutinaModal) {
+          consultarRutinaAlumno(verRutinaModal.usuarioId, verRutinaModal.nombreAlumno);
+        }
         cargarDatos(instructor.id);
       } else {
         alert("No se pudo eliminar la rutina.");
@@ -227,11 +215,24 @@ function Instructor() {
     }
   };
 
-  const agruparPorDiaOMusculo = (items) => {
+  // Agrupa los datos por ID de Rutina
+  const agruparPorRutina = (items) => {
     return items.reduce((acc, item) => {
-      const clave = item.dia_asignado || "General";
-      if (!acc[clave]) acc[clave] = [];
-      acc[clave].push(item);
+      const id = item.rutina_id;
+      if (!id) return acc;
+
+      if (!acc[id]) {
+        acc[id] = {
+          rutina_id: item.rutina_id,
+          nombre_rutina: item.nombre_rutina || "Rutina sin nombre",
+          dia_asignado: item.dia_asignado || "Lunes",
+          ejercicios: []
+        };
+      }
+
+      if (item.nombre_ejercicio) {
+        acc[id].ejercicios.push(item);
+      }
       return acc;
     }, {});
   };
@@ -250,7 +251,7 @@ function Instructor() {
           {cargando && <p className="texto-secundario">Cargando datos...</p>}
           {error && <p className="mensaje-error">{error}</p>}
 
-          {/* BARRA DE PESTAÑAS (MENÚ) */}
+          {/* BARRA DE PESTAÑAS */}
           <div style={{ display: "flex", gap: "12px", marginBottom: "25px", justifyContent: "center" }}>
             <button
               type="button"
@@ -277,7 +278,7 @@ function Instructor() {
             </button>
           </div>
 
-          {/* PESTAÑA 1: MIS ALUMNOS (VISTA PRINCIPAL) */}
+          {/* MIS ALUMNOS */}
           {pestanaActiva === "misAlumnos" && (
             <>
               <h2 className="section-title">🏋️ Mis Alumnos Asignados</h2>
@@ -301,7 +302,7 @@ function Instructor() {
                             className="btn-secundario"
                             onClick={() => consultarRutinaAlumno(idAlumno, alumno.nombre_completo)}
                           >
-                            👁️ Ver Rutina
+                            👁️ Ver Rutinas
                           </button>
                           <button 
                             className="btn-ver-rutina"
@@ -323,7 +324,7 @@ function Instructor() {
             </>
           )}
 
-          {/* PESTAÑA 2: ALUMNOS SIN ASIGNAR */}
+          {/* ALUMNOS SIN ASIGNAR */}
           {pestanaActiva === "alumnosLibres" && (
             <>
               <h2 className="section-title">📌 Alumnos Buscando Instructor</h2>
@@ -472,60 +473,62 @@ function Instructor() {
             </div>
           )}
 
-          {/* MODAL / VISTA "VER RUTINA" */}
+          {/* MODAL / VISTA "VER RUTINAS" */}
           {verRutinaModal && (
             <div className="tarjeta-formulario modal-ver-rutina" style={{ marginTop: "30px" }}>
               <div className="encabezado-modal">
-                <h3 className="subtitulo-formulario">Rutina Actual de {verRutinaModal.nombreAlumno}</h3>
+                <h3 className="subtitulo-formulario">Rutinas de {verRutinaModal.nombreAlumno}</h3>
                 <button className="btn-cerrar-modal" onClick={() => setVerRutinaModal(null)}>✖</button>
               </div>
 
-              {cargandoRutina && <p className="texto-secundario">Cargando ejercicios...</p>}
+              {cargandoRutina && <p className="texto-secundario">Cargando rutinas...</p>}
 
               {!cargandoRutina && rutinaAlumno.length === 0 && (
-                <p className="texto-vacio">Este alumno aún no tiene una rutina asignada.</p>
+                <p className="texto-vacio">Este alumno aún no tiene rutinas asignadas.</p>
               )}
 
               {!cargandoRutina && rutinaAlumno.length > 0 && (
-                <>
-                  <div className="barras-acciones-rutina">
-                    <button 
-                      className="btn-editar-rutina"
-                      onClick={() => prepararEdicion(verRutinaModal.usuarioId, verRutinaModal.nombreAlumno)}
-                    >
-                      ✏️ Editar Rutina
-                    </button>
-                    <button 
-                      className="btn-borrar-rutina"
-                      onClick={() => eliminarRutina(verRutinaModal.usuarioId, verRutinaModal.nombreAlumno)}
-                    >
-                      🗑️ Borrar Rutina
-                    </button>
-                  </div>
-
-                  <div className="vista-rutina-agrupada">
-                    {Object.entries(agruparPorDiaOMusculo(rutinaAlumno)).map(([dia, ejercicios]) => (
-                      <div key={dia} className="bloque-musculo-dia">
-                        <h4 className="titulo-bloque-dia">📅 Día / Categoría: {dia}</h4>
-                        <div className="lista-ejercicios-vista">
-                          {ejercicios.map((ej, idx) => (
-                            <div key={idx} className="tarjeta-ejercicio-vista">
-                              <div>
-                                <p className="ejercicio-nombre-vista">{ej.nombre_ejercicio}</p>
-                                {ej.descripcion && <p className="ejercicio-desc-vista">{ej.descripcion}</p>}
-                              </div>
-                              <div className="badge-series-reps">
-                                <span>{ej.series} Series</span>
-                                <span>•</span>
-                                <span>{ej.repeticiones} Reps</span>
-                              </div>
-                            </div>
-                          ))}
+                <div className="vista-rutina-agrupada">
+                  {Object.values(agruparPorRutina(rutinaAlumno)).map((grupo) => (
+                    <div key={grupo.rutina_id} className="bloque-musculo-dia" style={{ marginBottom: "20px" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
+                        <h4 className="titulo-bloque-dia" style={{ margin: 0 }}>
+                          📋 {grupo.nombre_rutina} — 📅 Día: {grupo.dia_asignado}
+                        </h4>
+                        <div style={{ display: "flex", gap: "8px" }}>
+                          <button 
+                            className="btn-editar-rutina"
+                            onClick={() => prepararEdicion(grupo, verRutinaModal.nombreAlumno)}
+                          >
+                            ✏️ Editar
+                          </button>
+                          <button 
+                            className="btn-borrar-rutina"
+                            onClick={() => eliminarRutinaEspecifica(grupo.rutina_id, grupo.nombre_rutina)}
+                          >
+                            🗑️ Borrar Rutina
+                          </button>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                </>
+
+                      <div className="lista-ejercicios-vista">
+                        {grupo.ejercicios.map((ej, idx) => (
+                          <div key={idx} className="tarjeta-ejercicio-vista">
+                            <div>
+                              <p className="ejercicio-nombre-vista">{ej.nombre_ejercicio}</p>
+                              {ej.descripcion && <p className="ejercicio-desc-vista">{ej.descripcion}</p>}
+                            </div>
+                            <div className="badge-series-reps">
+                              <span>{ej.series} Series</span>
+                              <span>•</span>
+                              <span>{ej.repeticiones} Reps</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               )}
             </div>
           )}

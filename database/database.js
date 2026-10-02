@@ -260,21 +260,20 @@ app.post('/api/rutinas', async (req, res) => {
     }
 });
 
-// 6. ELIMINAR RUTINA DE UN USUARIO (DELETE)
-app.delete('/api/rutinas/usuario/:usuario_id', async (req, res) => {
-  const { usuario_id } = req.params;
+// 6. ELIMINAR UNA RUTINA ESPECÍFICA
+app.delete('/api/rutinas/:id', async (req, res) => {
+  const { id } = req.params;
 
   try {
-    const [rutinas] = await db.query('SELECT id FROM Rutinas WHERE usuario_id = ?', [usuario_id]);
+    // 1. Borrar los ejercicios asociados a esa rutina
+    await db.query('DELETE FROM Rutina_Ejercicios WHERE rutina_id = ?', [id]);
 
-    if (rutinas.length === 0) {
-      return res.status(404).json({ mensaje: 'No se encontró rutina para este alumno.' });
+    // 2. Borrar la rutina especifica
+    const [resultado] = await db.query('DELETE FROM Rutinas WHERE id = ?', [id]);
+
+    if (resultado.affectedRows === 0) {
+      return res.status(404).json({ mensaje: 'No se encontró la rutina solicitada.' });
     }
-
-    const rutinaId = rutinas[0].id;
-
-    await db.query('DELETE FROM Rutina_Ejercicios WHERE rutina_id = ?', [rutinaId]);
-    await db.query('DELETE FROM Rutinas WHERE id = ?', [rutinaId]);
 
     res.json({ mensaje: 'Rutina eliminada correctamente' });
   } catch (error) {
