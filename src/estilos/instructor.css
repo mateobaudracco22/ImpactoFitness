@@ -360,3 +360,43 @@
   color: var(--texto-gris);
   font-size: 0.9rem;
 }
+
+/* Botones de Editar y Borrar dentro de la vista de rutina */
+.barras-acciones-rutina {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.btn-editar-rutina {
+  background-color: var(--tono-medio);
+  color: var(--bg-principal);
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.btn-editar-rutina:hover {
+  opacity: 0.9;
+}
+
+.btn-borrar-rutina {
+  background-color: transparent;
+  color: #ff5252;
+  border: 1px solid #ff5252;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-borrar-rutina:hover {
+  background-color: #ff5252;
+  color: var(--texto-blanco);
+}
