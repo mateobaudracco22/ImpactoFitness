@@ -2,10 +2,15 @@ import React, { useState, useEffect } from "react";
 import "../estilos/instructor.css";
 
 function Instructor() {
-  const [solicitudes, setSolicitudes] = useState([]);
+  const [instructor, setInstructor] = useState(null);
+  const [alumnosLibres, setAlumnosLibres] = useState([]);
+  const [misAlumnos, setMisAlumnos] = useState([]);
   const [ejerciciosDisponibles, setEjerciciosDisponibles] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
+
+  // Estado para la pestaña activa ("misAlumnos" o "alumnosLibres")
+  const [pestanaActiva, setPestanaActiva] = useState("misAlumnos");
 
   // Estado para armar/asignar/editar rutina
   const [solicitudSeleccionada, setSolicitudSeleccionada] = useState(null);
@@ -22,10 +27,17 @@ function Instructor() {
   const [cargandoRutina, setCargandoRutina] = useState(false);
 
   useEffect(() => {
-    cargarDatos();
+    const usuarioGuardado = localStorage.getItem("usuario");
+    if (usuarioGuardado) {
+      const profe = JSON.parse(usuarioGuardado);
+      setInstructor(profe);
+      cargarDatos(profe.id);
+    } else {
+      setCargando(false);
+    }
   }, []);
 
-  const cargarDatos = async () => {
+  const cargarDatos = async (instructorId) => {
     try {
       const [resSolicitudes, resEjercicios] = await Promise.all([
         fetch("http://localhost:3000/api/solicitudes"),
@@ -35,12 +47,46 @@ function Instructor() {
       const datosSolicitudes = await resSolicitudes.json();
       const datosEjercicios = await resEjercicios.json();
 
-      setSolicitudes(datosSolicitudes);
+      // Separar los que no tienen instructor y los que son de este profesor
+      const libres = datosSolicitudes.filter(s => !s.instructor_id);
+      const asignados = datosSolicitudes.filter(s => Number(s.instructor_id) === Number(instructorId));
+
+      setAlumnosLibres(libres);
+      setMisAlumnos(asignados);
       setEjerciciosDisponibles(datosEjercicios);
     } catch (err) {
       setError("Error al conectar con el servidor backend.");
     } finally {
       setCargando(false);
+    }
+  };
+
+  // Función para tomar al alumno
+  const tomarAlumno = async (usuarioId) => {
+    if (!instructor) {
+      alert("No se encontró una sesión activa de instructor.");
+      return;
+    }
+
+    try {
+      const respuesta = await fetch(`http://localhost:3000/api/alumnos/${usuarioId}/asignar`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ instructor_id: instructor.id })
+      });
+
+      const datos = await respuesta.json();
+
+      if (respuesta.ok) {
+        alert("¡Alumno asignado correctamente a tu lista!");
+        cargarDatos(instructor.id);
+        // Opcional: te redirige automáticamente a la lista de "Mis Alumnos"
+        setPestanaActiva("misAlumnos");
+      } else {
+        alert(datos.mensaje || datos.error || "No se pudo asignar el alumno.");
+      }
+    } catch (err) {
+      alert("Error al conectar con el servidor. Verifica que tu servidor database.js tenga agregada la ruta PUT /api/alumnos/:id/asignar y lo hayas reiniciado.");
     }
   };
 
@@ -76,7 +122,6 @@ function Instructor() {
       setNombreRutina(primeraFila.nombre_rutina || `Rutina de ${nombreAlumno}`);
       setDiaAsignado(primeraFila.dia_asignado || "Lunes");
 
-      // Mapear los ejercicios recibidos para el estado del formulario
       const ejerciciosFormateados = datos.map((item) => ({
         ejercicio_id: item.ejercicio_id,
         series: item.series,
@@ -91,11 +136,8 @@ function Instructor() {
     }
   };
 
-  // Borrar rutina asignada
   const eliminarRutina = async (usuarioId, nombreAlumno) => {
-    const confirmar = window.confirm(
-      `¿Estás seguro de que deseas borrar la rutina asignada a ${nombreAlumno}?`
-    );
+    const confirmar = window.confirm(`¿Estás seguro de que deseas borrar la rutina asignada a ${nombreAlumno}?`);
     if (!confirmar) return;
 
     try {
@@ -107,7 +149,7 @@ function Instructor() {
         alert("¡Rutina eliminada con éxito!");
         setVerRutinaModal(null);
         setRutinaAlumno([]);
-        cargarDatos();
+        cargarDatos(instructor.id);
       } else {
         alert("No se pudo eliminar la rutina.");
       }
@@ -164,8 +206,8 @@ function Instructor() {
         method: metodo,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          usuario_id: solicitudSeleccionada.usuario_id,
-          instructor_id: 2,
+          usuario_id: solicitudSeleccionada.usuario_id || solicitudSeleccionada.id,
+          instructor_id: instructor ? instructor.id : null,
           nombre_rutina: nombreRutina,
           proposito: solicitudSeleccionada.proposito_solicitado || "Gimnasio General",
           dia_asignado: diaAsignado,
@@ -176,7 +218,7 @@ function Instructor() {
       if (respuesta.ok) {
         alert(esEdicion ? "¡Rutina actualizada correctamente!" : "¡Rutina asignada exitosamente!");
         resetearFormulario();
-        cargarDatos();
+        cargarDatos(instructor.id);
       } else {
         alert("Ocurrió un error al procesar la rutina.");
       }
@@ -199,55 +241,126 @@ function Instructor() {
       <div className="instructor-content">
         <header className="header-card">
           <h1 className="header-title">Panel del Instructor</h1>
-          <p className="header-subtitle">Gestión de alumnos y asignación de rutinas</p>
+          <p className="header-subtitle">
+            {instructor ? `Bienvenido/a, ${instructor.nombre_completo}` : "Gestión de alumnos y rutinas"}
+          </p>
         </header>
 
         <main>
-          <h2 className="section-title">Solicitudes Pendientes</h2>
-
           {cargando && <p className="texto-secundario">Cargando datos...</p>}
           {error && <p className="mensaje-error">{error}</p>}
 
-          <div className="alumnos-list">
-            {solicitudes.map((solicitud) => (
-              <div key={solicitud.id} className="alumno-card">
-                <div className="alumno-info">
-                  <h3 className="alumno-nombre">{solicitud.nombre_completo}</h3>
-                  <p className="alumno-rutina"><strong>Objetivo:</strong> {solicitud.proposito_solicitado}</p>
-                  {solicitud.ejercicios_no_aptos && (
-                    <p className="alumno-limitacion">
-                      ⚠️ Limitación: {solicitud.ejercicios_no_aptos}
-                    </p>
-                  )}
-                </div>
+          {/* BARRA DE PESTAÑAS (MENÚ) */}
+          <div style={{ display: "flex", gap: "12px", marginBottom: "25px", justifyContent: "center" }}>
+            <button
+              type="button"
+              className={pestanaActiva === "misAlumnos" ? "btn-ver-rutina" : "btn-secundario"}
+              onClick={() => {
+                setPestanaActiva("misAlumnos");
+                resetearFormulario();
+                setVerRutinaModal(null);
+              }}
+            >
+              🏋️ Mis Alumnos ({misAlumnos.length})
+            </button>
 
-                <div className="contenedor-botones-card">
-                  <button 
-                    className="btn-secundario"
-                    onClick={() => consultarRutinaAlumno(solicitud.usuario_id, solicitud.nombre_completo)}
-                  >
-                    Ver Rutina
-                  </button>
-
-                  <button 
-                    className="btn-ver-rutina"
-                    onClick={() => {
-                      resetearFormulario();
-                      setSolicitudSeleccionada(solicitud);
-                      setNombreRutina(`Rutina de ${solicitud.nombre_completo}`);
-                      setVerRutinaModal(null);
-                    }}
-                  >
-                    Asignar Rutina
-                  </button>
-                </div>
-              </div>
-            ))}
+            <button
+              type="button"
+              className={pestanaActiva === "alumnosLibres" ? "btn-ver-rutina" : "btn-secundario"}
+              onClick={() => {
+                setPestanaActiva("alumnosLibres");
+                resetearFormulario();
+                setVerRutinaModal(null);
+              }}
+            >
+              📌 Alumnos Sin Asignar ({alumnosLibres.length})
+            </button>
           </div>
 
-          {/* Formulario para Armar/Editar Rutina */}
+          {/* PESTAÑA 1: MIS ALUMNOS (VISTA PRINCIPAL) */}
+          {pestanaActiva === "misAlumnos" && (
+            <>
+              <h2 className="section-title">🏋️ Mis Alumnos Asignados</h2>
+              <div className="alumnos-list">
+                {misAlumnos.length === 0 ? (
+                  <p className="texto-vacio">Aún no has tomado ningún alumno. Ve a 'Alumnos Sin Asignar' para tomar uno.</p>
+                ) : (
+                  misAlumnos.map((alumno) => {
+                    const idAlumno = alumno.usuario_id || alumno.id;
+                    return (
+                      <div key={idAlumno} className="alumno-card">
+                        <div className="alumno-info">
+                          <h3 className="alumno-nombre">{alumno.nombre_completo}</h3>
+                          <p className="alumno-rutina"><strong>Objetivo:</strong> {alumno.proposito_solicitado || alumno.objetivo}</p>
+                          {alumno.ejercicios_no_aptos && (
+                            <p className="alumno-limitacion">⚠️ Limitación: {alumno.ejercicios_no_aptos}</p>
+                          )}
+                        </div>
+                        <div className="contenedor-botones-card">
+                          <button 
+                            className="btn-secundario"
+                            onClick={() => consultarRutinaAlumno(idAlumno, alumno.nombre_completo)}
+                          >
+                            👁️ Ver Rutina
+                          </button>
+                          <button 
+                            className="btn-ver-rutina"
+                            onClick={() => {
+                              resetearFormulario();
+                              setSolicitudSeleccionada({ ...alumno, usuario_id: idAlumno });
+                              setNombreRutina(`Rutina de ${alumno.nombre_completo}`);
+                              setVerRutinaModal(null);
+                            }}
+                          >
+                            ➕ Armar Rutina
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </>
+          )}
+
+          {/* PESTAÑA 2: ALUMNOS SIN ASIGNAR */}
+          {pestanaActiva === "alumnosLibres" && (
+            <>
+              <h2 className="section-title">📌 Alumnos Buscando Instructor</h2>
+              <div className="alumnos-list">
+                {alumnosLibres.length === 0 ? (
+                  <p className="texto-vacio">No hay alumnos libres en este momento.</p>
+                ) : (
+                  alumnosLibres.map((solicitud) => {
+                    const idAlumno = solicitud.usuario_id || solicitud.id;
+                    return (
+                      <div key={idAlumno} className="alumno-card">
+                        <div className="alumno-info">
+                          <h3 className="alumno-nombre">{solicitud.nombre_completo}</h3>
+                          <p className="alumno-rutina"><strong>Objetivo:</strong> {solicitud.proposito_solicitado || solicitud.objetivo}</p>
+                          {solicitud.ejercicios_no_aptos && (
+                            <p className="alumno-limitacion">⚠️ Limitación: {solicitud.ejercicios_no_aptos}</p>
+                          )}
+                        </div>
+                        <div className="contenedor-botones-card">
+                          <button 
+                            className="btn-ver-rutina"
+                            onClick={() => tomarAlumno(idAlumno)}
+                          >
+                            🤝 Tomar Alumno
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </>
+          )}
+
+          {/* FORMULARIO PARA ARMAR / EDITAR RUTINA */}
           {solicitudSeleccionada && (
-            <div className="tarjeta-formulario">
+            <div className="tarjeta-formulario" style={{ marginTop: "30px" }}>
               <h3 className="subtitulo-formulario">
                 {esEdicion ? `✏️ Editar Rutina de: ${solicitudSeleccionada.nombre_completo}` : `➕ Armar Rutina para: ${solicitudSeleccionada.nombre_completo}`}
               </h3>
@@ -282,7 +395,7 @@ function Instructor() {
                 </div>
 
                 <div className="campo-grupo">
-                  <label className="etiqueta-input">Agregar Ejercicio al Listado</label>
+                  <label className="etiqueta-input">Agregar Ejercicio</label>
                   <select 
                     className="select-estilizado"
                     onChange={(e) => {
@@ -297,11 +410,10 @@ function Instructor() {
                   </select>
                 </div>
 
-                {/* Lista de Ejercicios */}
                 <div className="contenedor-ejercicios-rutina">
                   <h4 className="etiqueta-input">Ejercicios Seleccionados</h4>
                   {ejerciciosSeleccionados.length === 0 && (
-                    <p className="texto-vacio">Aún no has agregado ejercicios a esta rutina.</p>
+                    <p className="texto-vacio">Agrega ejercicios a esta rutina.</p>
                   )}
 
                   {ejerciciosSeleccionados.map((item, index) => {
@@ -322,7 +434,7 @@ function Instructor() {
                           </div>
 
                           <div className="campo-mini">
-                            <label>Reps / Vueltas</label>
+                            <label>Reps</label>
                             <input 
                               type="text" 
                               className="input-mini"
@@ -360,9 +472,9 @@ function Instructor() {
             </div>
           )}
 
-          {/* Modal / Sección "Ver Rutina del Alumno" */}
+          {/* MODAL / VISTA "VER RUTINA" */}
           {verRutinaModal && (
-            <div className="tarjeta-formulario modal-ver-rutina">
+            <div className="tarjeta-formulario modal-ver-rutina" style={{ marginTop: "30px" }}>
               <div className="encabezado-modal">
                 <h3 className="subtitulo-formulario">Rutina Actual de {verRutinaModal.nombreAlumno}</h3>
                 <button className="btn-cerrar-modal" onClick={() => setVerRutinaModal(null)}>✖</button>

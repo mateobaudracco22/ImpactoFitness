@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // 1. Importamos la navegación
+import { useNavigate } from "react-router-dom";
 import "../estilos/login.css";
 
 function Login({ onLoginExitoso }) {
@@ -8,7 +8,7 @@ function Login({ onLoginExitoso }) {
   const [mostrarPassword, setMostrarPassword] = useState(false);
   const [error, setError] = useState("");
 
-  const navigate = useNavigate(); // 2. Inicializamos el hook de navegación
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -30,10 +30,18 @@ function Login({ onLoginExitoso }) {
         return;
       }
 
+      // Guardar los datos del usuario en el navegador
       localStorage.setItem("usuario", JSON.stringify(datos.usuario));
 
       if (onLoginExitoso) {
         onLoginExitoso(datos.usuario);
+      }
+
+      // Redirigir según el rol del usuario
+      if (datos.usuario.rol === "instructor") {
+        navigate("/instructor");
+      } else {
+        navigate("/informacion");
       }
     } catch (err) {
       setError("No se pudo conectar con el servidor. Verifica que esté encendido.");
@@ -89,7 +97,7 @@ function Login({ onLoginExitoso }) {
           <button 
             type="button" 
             className="boton-crear-cuenta" 
-            onClick={() => navigate("/crear.cuenta")} // 3. Ruta corregida (sin el punto inicial)
+            onClick={() => navigate("/crear.cuenta")}
           >
             Crear Cuenta
           </button>

@@ -35,7 +35,9 @@ async function inicializarBaseDeDatos() {
                 telefono VARCHAR(50),
                 objetivo ENUM('musculacion/fuerza', 'cardio/perdida_peso', 'clases/funcional'),
                 rol ENUM('cliente', 'instructor', 'admin') DEFAULT 'cliente',
-                password_hash VARCHAR(255) NOT NULL
+                password_hash VARCHAR(255) NOT NULL,
+                instructor_id INT NULL,
+                FOREIGN KEY (instructor_id) REFERENCES Usuarios(id) ON DELETE SET NULL
             );
         `);
 
@@ -181,7 +183,7 @@ app.post('/api/ejercicios', async (req, res) => {
     }
 });
 
-// 4. SOLICITUDES DE RUTINA (Para que los clientes pidan rutinas)
+// 4. SOLICITUDES DE RUTINA
 app.post('/api/solicitudes', async (req, res) => {
     const { usuario_id, proposito_solicitado, ejercicios_no_aptos } = req.body;
     try {
@@ -197,9 +199,9 @@ app.post('/api/solicitudes', async (req, res) => {
 
 app.get('/api/solicitudes', async (req, res) => {
     try {
-        // Trae las solicitudes junto con el nombre del alumno que la pidió
+        // Trae las solicitudes junto con el nombre y el instructor_id del alumno
         const [solicitudes] = await db.query(`
-            SELECT s.*, u.nombre_completo, u.email 
+            SELECT s.*, u.nombre_completo, u.email, u.instructor_id 
             FROM Solicitudes_Rutina s 
             JOIN Usuarios u ON s.usuario_id = u.id 
             WHERE s.estado = 'Pendiente'
@@ -210,11 +212,10 @@ app.get('/api/solicitudes', async (req, res) => {
     }
 });
 
-// 5. RUTINAS Y RUTINA_EJERCICIOS (Para asignar y consultar rutinas)
+// 5. RUTINAS Y RUTINA_EJERCICIOS
 app.get('/api/rutinas/usuario/:usuario_id', async (req, res) => {
     const { usuario_id } = req.params;
     try {
-        // Obtener las rutinas del usuario con sus ejercicios, series y repeticiones
         const [rutinas] = await db.query(`
             SELECT r.id AS rutina_id, r.nombre_rutina, r.proposito, r.dia_asignado,
                    re.series, re.repeticiones, re.orden,
@@ -242,7 +243,7 @@ app.post('/api/rutinas', async (req, res) => {
         );
         const rutinaId = resultadoRutina.insertId;
 
-        // 2. Insertar cada ejercicio asignado a esa rutina en la tabla Rutina_Ejercicios
+        // 2. Insertar ejercicios asignados
         if (ejercicios && ejercicios.length > 0) {
             for (let i = 0; i < ejercicios.length; i++) {
                 const ej = ejercicios[i];
@@ -264,7 +265,6 @@ app.delete('/api/rutinas/usuario/:usuario_id', async (req, res) => {
   const { usuario_id } = req.params;
 
   try {
-    // 1. Buscar la rutina asociada al usuario
     const [rutinas] = await db.query('SELECT id FROM Rutinas WHERE usuario_id = ?', [usuario_id]);
 
     if (rutinas.length === 0) {
@@ -273,10 +273,7 @@ app.delete('/api/rutinas/usuario/:usuario_id', async (req, res) => {
 
     const rutinaId = rutinas[0].id;
 
-    // 2. Borrar los ejercicios asociados a la rutina
     await db.query('DELETE FROM Rutina_Ejercicios WHERE rutina_id = ?', [rutinaId]);
-
-    // 3. Borrar la cabecera de la rutina
     await db.query('DELETE FROM Rutinas WHERE id = ?', [rutinaId]);
 
     res.json({ mensaje: 'Rutina eliminada correctamente' });
@@ -287,19 +284,16 @@ app.delete('/api/rutinas/usuario/:usuario_id', async (req, res) => {
 });
 
 // 7. ACTUALIZAR/EDITAR RUTINA (PUT)
-
 app.put('/api/rutinas/:id', async (req, res) => {
   const { id } = req.params;
   const { nombre_rutina, dia_asignado, ejercicios } = req.body;
 
   try {
-    // 1. Actualizar datos de la rutina principal
     await db.query(
       'UPDATE Rutinas SET nombre_rutina = ?, dia_asignado = ? WHERE id = ?',
       [nombre_rutina, dia_asignado, id]
     );
 
-    // 2. Reemplazar ejercicios
     await db.query('DELETE FROM Rutina_Ejercicios WHERE rutina_id = ?', [id]);
 
     for (const ej of ejercicios) {
@@ -314,6 +308,56 @@ app.put('/api/rutinas/:id', async (req, res) => {
     console.error('Error al actualizar la rutina:', error);
     res.status(500).json({ error: 'Error al actualizar la rutina.' });
   }
+});
+
+// 8. ASIGNACIÓN Y GESTIÓN DE ALUMNOS
+
+// Obtener solo alumnos que NO tienen instructor asignado (Alumnos Libres)
+app.get('/api/alumnos/libres', async (req, res) => {
+    try {
+        const [alumnosLibres] = await db.query(
+            "SELECT id, nombre_completo, email, telefono, objetivo FROM Usuarios WHERE rol = 'cliente' AND instructor_id IS NULL"
+        );
+        res.json(alumnosLibres);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Obtener los alumnos asignados a un instructor específico
+app.get('/api/alumnos/mis-alumnos/:instructor_id', async (req, res) => {
+    const { instructor_id } = req.params;
+    try {
+        const [misAlumnos] = await db.query(
+            "SELECT id, nombre_completo, email, telefono, objetivo FROM Usuarios WHERE rol = 'cliente' AND instructor_id = ?",
+            [instructor_id]
+        );
+        res.json(misAlumnos);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Asignar un alumno a un instructor
+app.put('/api/alumnos/:id/asignar', async (req, res) => {
+    const alumnoId = req.params.id;
+    const { instructor_id } = req.body;
+
+    try {
+        const [resultado] = await db.query(
+            'UPDATE Usuarios SET instructor_id = ? WHERE id = ?',
+            [instructor_id, alumnoId]
+        );
+
+        if (resultado.affectedRows === 0) {
+            return res.status(404).json({ error: 'Alumno no encontrado.' });
+        }
+
+        res.json({ mensaje: 'Alumno asignado correctamente.' });
+    } catch (error) {
+        console.error('Error al asignar alumno:', error);
+        res.status(500).json({ error: 'Error al asignar alumno en la base de datos.' });
+    }
 });
 
 // --- ARRANCAR EL SERVIDOR ---
