@@ -9,8 +9,8 @@ function Instructor() {
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
 
-  // Estado para la pestaña activa ("misAlumnos" o "alumnosLibres")
-  const [pestanaActiva, setPestanaActiva] = useState("misAlumnos");
+  // Estado para controlar la apertura del menú lateral desplegable
+  const [menuLateralAbierto, setMenuLateralAbierto] = useState(false);
 
   // Estado para armar/asignar/editar rutina
   const [solicitudSeleccionada, setSolicitudSeleccionada] = useState(null);
@@ -21,7 +21,7 @@ function Instructor() {
   const [diaAsignado, setDiaAsignado] = useState("Lunes");
   const [ejerciciosSeleccionados, setEjerciciosSeleccionados] = useState([]);
 
-  // Estado para el modal/sección de "Ver Rutina"
+  // Estado para el modal de "Ver Rutina"
   const [verRutinaModal, setVerRutinaModal] = useState(null);
   const [rutinaAlumno, setRutinaAlumno] = useState([]);
   const [cargandoRutina, setCargandoRutina] = useState(false);
@@ -78,7 +78,7 @@ function Instructor() {
       if (respuesta.ok) {
         alert("¡Alumno asignado correctamente a tu lista!");
         cargarDatos(instructor.id);
-        setPestanaActiva("misAlumnos");
+        setMenuLateralAbierto(false); // Cierra el menú al tomar un alumno
       } else {
         alert(datos.mensaje || datos.error || "No se pudo asignar el alumno.");
       }
@@ -101,7 +101,6 @@ function Instructor() {
     }
   };
 
-  // Prepara la edición de UNA rutina específica seleccionada
   const prepararEdicion = (grupoRutina, nombreAlumno) => {
     setEsEdicion(true);
     setIdRutinaAEditar(grupoRutina.rutina_id);
@@ -121,8 +120,12 @@ function Instructor() {
     setVerRutinaModal(null);
   };
 
-  // Elimina UNA rutina específica seleccionada por su rutina_id
   const eliminarRutinaEspecifica = async (rutinaId, tituloRutina) => {
+    if (!rutinaId) {
+      alert("Error: No se encontró el ID de la rutina.");
+      return;
+    }
+
     const confirmar = window.confirm(`¿Estás seguro de que deseas borrar la rutina "${tituloRutina}"?`);
     if (!confirmar) return;
 
@@ -131,15 +134,16 @@ function Instructor() {
         method: "DELETE"
       });
 
+      const datos = await respuesta.json().catch(() => ({}));
+
       if (respuesta.ok) {
         alert("¡Rutina eliminada con éxito!");
-        // Re-consultar las rutinas restantes del alumno
         if (verRutinaModal) {
           consultarRutinaAlumno(verRutinaModal.usuarioId, verRutinaModal.nombreAlumno);
         }
         cargarDatos(instructor.id);
       } else {
-        alert("No se pudo eliminar la rutina.");
+        alert(datos.error || datos.mensaje || `Error ${respuesta.status}: No se pudo borrar.`);
       }
     } catch (err) {
       alert("Error de conexión al intentar borrar la rutina.");
@@ -215,7 +219,6 @@ function Instructor() {
     }
   };
 
-  // Agrupa los datos por ID de Rutina
   const agruparPorRutina = (items) => {
     return items.reduce((acc, item) => {
       const id = item.rutina_id;
@@ -239,6 +242,64 @@ function Instructor() {
 
   return (
     <div className="instructor-container">
+      {/* BOTÓN FLOTANTE IZQUIERDO PARA ABRIR MENÚ DE ALUMNOS SIN ASIGNAR */}
+      <button 
+        type="button"
+        className="btn-flotante-izquierda"
+        onClick={() => setMenuLateralAbierto(true)}
+        title="Ver alumnos sin asignar"
+      >
+        📌 <span className="badge-contador">{alumnosLibres.length}</span>
+      </button>
+
+      {/* MENÚ LATERAL DESPLEGABLE (SIDE DRAWER) */}
+      {menuLateralAbierto && (
+        <div className="drawer-overlay" onClick={() => setMenuLateralAbierto(false)}>
+          <div className="drawer-contenido" onClick={(e) => e.stopPropagation()}>
+            <div className="encabezado-modal">
+              <h3 className="subtitulo-formulario" style={{ margin: 0 }}>
+                📌 Sin Asignar ({alumnosLibres.length})
+              </h3>
+              <button 
+                type="button" 
+                className="btn-cerrar-modal" 
+                onClick={() => setMenuLateralAbierto(false)}
+              >
+                ✖
+              </button>
+            </div>
+
+            <div className="alumnos-list" style={{ marginTop: "15px" }}>
+              {alumnosLibres.length === 0 ? (
+                <p className="texto-vacio">No hay alumnos libres en este momento.</p>
+              ) : (
+                alumnosLibres.map((solicitud) => {
+                  const idAlumno = solicitud.usuario_id || solicitud.id;
+                  return (
+                    <div key={idAlumno} className="alumno-card-mini">
+                      <div className="alumno-info">
+                        <h4 className="alumno-nombre" style={{ fontSize: "16px" }}>{solicitud.nombre_completo}</h4>
+                        <p className="alumno-rutina"><strong>Objetivo:</strong> {solicitud.proposito_solicitado || solicitud.objetivo}</p>
+                        {solicitud.ejercicios_no_aptos && (
+                          <p className="alumno-limitacion">⚠️ {solicitud.ejercicios_no_aptos}</p>
+                        )}
+                      </div>
+                      <button 
+                        className="btn-ver-rutina"
+                        style={{ width: "100%", marginTop: "8px" }}
+                        onClick={() => tomarAlumno(idAlumno)}
+                      >
+                        🤝 Tomar Alumno
+                      </button>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="instructor-content">
         <header className="header-card">
           <h1 className="header-title">Panel del Instructor</h1>
@@ -251,285 +312,226 @@ function Instructor() {
           {cargando && <p className="texto-secundario">Cargando datos...</p>}
           {error && <p className="mensaje-error">{error}</p>}
 
-          {/* BARRA DE PESTAÑAS */}
-          <div style={{ display: "flex", gap: "12px", marginBottom: "25px", justifyContent: "center" }}>
-            <button
-              type="button"
-              className={pestanaActiva === "misAlumnos" ? "btn-ver-rutina" : "btn-secundario"}
-              onClick={() => {
-                setPestanaActiva("misAlumnos");
-                resetearFormulario();
-                setVerRutinaModal(null);
-              }}
-            >
-              🏋️ Mis Alumnos ({misAlumnos.length})
-            </button>
-
-            <button
-              type="button"
-              className={pestanaActiva === "alumnosLibres" ? "btn-ver-rutina" : "btn-secundario"}
-              onClick={() => {
-                setPestanaActiva("alumnosLibres");
-                resetearFormulario();
-                setVerRutinaModal(null);
-              }}
-            >
-              📌 Alumnos Sin Asignar ({alumnosLibres.length})
-            </button>
+          {/* VISTA PRINCIPAL: MIS ALUMNOS ASIGNADOS */}
+          <h2 className="section-title">🏋️ Mis Alumnos Asignados</h2>
+          <div className="alumnos-list">
+            {misAlumnos.length === 0 ? (
+              <p className="texto-vacio">Aún no has tomado ningún alumno. Toca el icono de la izquierda (📌) para ver la lista de alumnos disponibles.</p>
+            ) : (
+              misAlumnos.map((alumno) => {
+                const idAlumno = alumno.usuario_id || alumno.id;
+                return (
+                  <div key={idAlumno} className="alumno-card">
+                    <div className="alumno-info">
+                      <h3 className="alumno-nombre">{alumno.nombre_completo}</h3>
+                      <p className="alumno-rutina"><strong>Objetivo:</strong> {alumno.proposito_solicitado || alumno.objetivo}</p>
+                      {alumno.ejercicios_no_aptos && (
+                        <p className="alumno-limitacion">⚠️ Limitación: {alumno.ejercicios_no_aptos}</p>
+                      )}
+                    </div>
+                    <div className="contenedor-botones-card">
+                      <button 
+                        className="btn-secundario"
+                        onClick={() => consultarRutinaAlumno(idAlumno, alumno.nombre_completo)}
+                      >
+                        👁️ Ver Rutinas
+                      </button>
+                      <button 
+                        className="btn-ver-rutina"
+                        onClick={() => {
+                          resetearFormulario();
+                          setSolicitudSeleccionada({ ...alumno, usuario_id: idAlumno });
+                          setNombreRutina(`Rutina de ${alumno.nombre_completo}`);
+                          setVerRutinaModal(null);
+                        }}
+                      >
+                        ➕ Armar Rutina
+                      </button>
+                    </div>
+                  </div>
+                );
+              })
+            )}
           </div>
 
-          {/* MIS ALUMNOS */}
-          {pestanaActiva === "misAlumnos" && (
-            <>
-              <h2 className="section-title">🏋️ Mis Alumnos Asignados</h2>
-              <div className="alumnos-list">
-                {misAlumnos.length === 0 ? (
-                  <p className="texto-vacio">Aún no has tomado ningún alumno. Ve a 'Alumnos Sin Asignar' para tomar uno.</p>
-                ) : (
-                  misAlumnos.map((alumno) => {
-                    const idAlumno = alumno.usuario_id || alumno.id;
-                    return (
-                      <div key={idAlumno} className="alumno-card">
-                        <div className="alumno-info">
-                          <h3 className="alumno-nombre">{alumno.nombre_completo}</h3>
-                          <p className="alumno-rutina"><strong>Objetivo:</strong> {alumno.proposito_solicitado || alumno.objetivo}</p>
-                          {alumno.ejercicios_no_aptos && (
-                            <p className="alumno-limitacion">⚠️ Limitación: {alumno.ejercicios_no_aptos}</p>
-                          )}
-                        </div>
-                        <div className="contenedor-botones-card">
-                          <button 
-                            className="btn-secundario"
-                            onClick={() => consultarRutinaAlumno(idAlumno, alumno.nombre_completo)}
-                          >
-                            👁️ Ver Rutinas
-                          </button>
-                          <button 
-                            className="btn-ver-rutina"
-                            onClick={() => {
-                              resetearFormulario();
-                              setSolicitudSeleccionada({ ...alumno, usuario_id: idAlumno });
-                              setNombreRutina(`Rutina de ${alumno.nombre_completo}`);
-                              setVerRutinaModal(null);
-                            }}
-                          >
-                            ➕ Armar Rutina
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })
-                )}
-              </div>
-            </>
-          )}
-
-          {/* ALUMNOS SIN ASIGNAR */}
-          {pestanaActiva === "alumnosLibres" && (
-            <>
-              <h2 className="section-title">📌 Alumnos Buscando Instructor</h2>
-              <div className="alumnos-list">
-                {alumnosLibres.length === 0 ? (
-                  <p className="texto-vacio">No hay alumnos libres en este momento.</p>
-                ) : (
-                  alumnosLibres.map((solicitud) => {
-                    const idAlumno = solicitud.usuario_id || solicitud.id;
-                    return (
-                      <div key={idAlumno} className="alumno-card">
-                        <div className="alumno-info">
-                          <h3 className="alumno-nombre">{solicitud.nombre_completo}</h3>
-                          <p className="alumno-rutina"><strong>Objetivo:</strong> {solicitud.proposito_solicitado || solicitud.objetivo}</p>
-                          {solicitud.ejercicios_no_aptos && (
-                            <p className="alumno-limitacion">⚠️ Limitación: {solicitud.ejercicios_no_aptos}</p>
-                          )}
-                        </div>
-                        <div className="contenedor-botones-card">
-                          <button 
-                            className="btn-ver-rutina"
-                            onClick={() => tomarAlumno(idAlumno)}
-                          >
-                            🤝 Tomar Alumno
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })
-                )}
-              </div>
-            </>
-          )}
-
-          {/* FORMULARIO PARA ARMAR / EDITAR RUTINA */}
+          {/* MODAL / VENTANA EMERGENTE: ARMAR O EDITAR RUTINA */}
           {solicitudSeleccionada && (
-            <div className="tarjeta-formulario" style={{ marginTop: "30px" }}>
-              <h3 className="subtitulo-formulario">
-                {esEdicion ? `✏️ Editar Rutina de: ${solicitudSeleccionada.nombre_completo}` : `➕ Armar Rutina para: ${solicitudSeleccionada.nombre_completo}`}
-              </h3>
-              
-              <form onSubmit={guardarRutina} className="formulario-rutina">
-                <div className="campo-grupo">
-                  <label className="etiqueta-input">Nombre de la Rutina</label>
-                  <input 
-                    type="text" 
-                    className="input-estilizado"
-                    value={nombreRutina} 
-                    onChange={(e) => setNombreRutina(e.target.value)}
-                    required
-                  />
+            <div className="modal-overlay" onClick={resetearFormulario}>
+              <div className="tarjeta-formulario modal-contenido" onClick={(e) => e.stopPropagation()}>
+                <div className="encabezado-modal">
+                  <h3 className="subtitulo-formulario">
+                    {esEdicion ? `✏️ Editar Rutina de: ${solicitudSeleccionada.nombre_completo}` : `➕ Armar Rutina para: ${solicitudSeleccionada.nombre_completo}`}
+                  </h3>
+                  <button type="button" className="btn-cerrar-modal" onClick={resetearFormulario}>✖</button>
                 </div>
+                
+                <form onSubmit={guardarRutina} className="formulario-rutina">
+                  <div className="campo-grupo">
+                    <label className="etiqueta-input">Nombre de la Rutina</label>
+                    <input 
+                      type="text" 
+                      className="input-estilizado"
+                      value={nombreRutina} 
+                      onChange={(e) => setNombreRutina(e.target.value)}
+                      required
+                    />
+                  </div>
 
-                <div className="campo-grupo">
-                  <label className="etiqueta-input">Día Asignado</label>
-                  <select 
-                    className="select-estilizado"
-                    value={diaAsignado} 
-                    onChange={(e) => setDiaAsignado(e.target.value)}
-                  >
-                    <option value="Lunes">Lunes</option>
-                    <option value="Martes">Martes</option>
-                    <option value="Miercoles">Miércoles</option>
-                    <option value="Jueves">Jueves</option>
-                    <option value="Viernes">Viernes</option>
-                    <option value="Sabado">Sábado</option>
-                    <option value="Domingo">Domingo</option>
-                  </select>
-                </div>
+                  <div className="campo-grupo">
+                    <label className="etiqueta-input">Día Asignado</label>
+                    <select 
+                      className="select-estilizado"
+                      value={diaAsignado} 
+                      onChange={(e) => setDiaAsignado(e.target.value)}
+                    >
+                      <option value="Lunes">Lunes</option>
+                      <option value="Martes">Martes</option>
+                      <option value="Miercoles">Miércoles</option>
+                      <option value="Jueves">Jueves</option>
+                      <option value="Viernes">Viernes</option>
+                      <option value="Sabado">Sábado</option>
+                      <option value="Domingo">Domingo</option>
+                    </select>
+                  </div>
 
-                <div className="campo-grupo">
-                  <label className="etiqueta-input">Agregar Ejercicio</label>
-                  <select 
-                    className="select-estilizado"
-                    onChange={(e) => {
-                      agregarEjercicioARutina(e.target.value);
-                      e.target.value = "";
-                    }}
-                  >
-                    <option value="">-- Selecciona un ejercicio --</option>
-                    {ejerciciosDisponibles.map((ej) => (
-                      <option key={ej.id} value={ej.id}>{ej.nombre}</option>
-                    ))}
-                  </select>
-                </div>
+                  <div className="campo-grupo">
+                    <label className="etiqueta-input">Agregar Ejercicio</label>
+                    <select 
+                      className="select-estilizado"
+                      onChange={(e) => {
+                        agregarEjercicioARutina(e.target.value);
+                        e.target.value = "";
+                      }}
+                    >
+                      <option value="">-- Selecciona un ejercicio --</option>
+                      {ejerciciosDisponibles.map((ej) => (
+                        <option key={ej.id} value={ej.id}>{ej.nombre}</option>
+                      ))}
+                    </select>
+                  </div>
 
-                <div className="contenedor-ejercicios-rutina">
-                  <h4 className="etiqueta-input">Ejercicios Seleccionados</h4>
-                  {ejerciciosSeleccionados.length === 0 && (
-                    <p className="texto-vacio">Agrega ejercicios a esta rutina.</p>
-                  )}
+                  <div className="contenedor-ejercicios-rutina">
+                    <h4 className="etiqueta-input">Ejercicios Seleccionados</h4>
+                    {ejerciciosSeleccionados.length === 0 && (
+                      <p className="texto-vacio">Agrega ejercicios a esta rutina.</p>
+                    )}
 
-                  {ejerciciosSeleccionados.map((item, index) => {
-                    const det = ejerciciosDisponibles.find(e => e.id === item.ejercicio_id);
-                    return (
-                      <div key={index} className="fila-ejercicio-item">
-                        <span className="nombre-ejercicio-item">{det?.nombre || `Ejercicio #${item.ejercicio_id}`}</span>
-                        
-                        <div className="control-series-reps">
-                          <div className="campo-mini">
-                            <label>Series</label>
-                            <input 
-                              type="number" 
-                              className="input-mini"
-                              value={item.series} 
-                              onChange={(e) => actualizarDetalleEjercicio(index, "series", e.target.value)}
-                            />
+                    {ejerciciosSeleccionados.map((item, index) => {
+                      const det = ejerciciosDisponibles.find(e => e.id === item.ejercicio_id);
+                      return (
+                        <div key={index} className="fila-ejercicio-item">
+                          <span className="nombre-ejercicio-item">{det?.nombre || `Ejercicio #${item.ejercicio_id}`}</span>
+                          
+                          <div className="control-series-reps">
+                            <div className="campo-mini">
+                              <label>Series</label>
+                              <input 
+                                type="number" 
+                                className="input-mini"
+                                value={item.series} 
+                                onChange={(e) => actualizarDetalleEjercicio(index, "series", e.target.value)}
+                              />
+                            </div>
+
+                            <div className="campo-mini">
+                              <label>Reps</label>
+                              <input 
+                                type="text" 
+                                className="input-mini"
+                                value={item.repeticiones} 
+                                onChange={(e) => actualizarDetalleEjercicio(index, "repeticiones", e.target.value)}
+                              />
+                            </div>
+
+                            <button 
+                              type="button" 
+                              className="btn-eliminar-item"
+                              onClick={() => eliminarEjercicioDeRutina(index)}
+                            >
+                              ✖
+                            </button>
                           </div>
-
-                          <div className="campo-mini">
-                            <label>Reps</label>
-                            <input 
-                              type="text" 
-                              className="input-mini"
-                              value={item.repeticiones} 
-                              onChange={(e) => actualizarDetalleEjercicio(index, "repeticiones", e.target.value)}
-                            />
-                          </div>
-
-                          <button 
-                            type="button" 
-                            className="btn-eliminar-item"
-                            onClick={() => eliminarEjercicioDeRutina(index)}
-                          >
-                            ✖
-                          </button>
                         </div>
-                      </div>
-                    );
-                  })}
-                </div>
+                      );
+                    })}
+                  </div>
 
-                <div className="acciones-formulario">
-                  <button type="submit" className="btn-ver-rutina">
-                    {esEdicion ? "Guardar Cambios" : "Guardar y Asignar"}
-                  </button>
-                  <button 
-                    type="button" 
-                    className="btn-cancelar"
-                    onClick={resetearFormulario}
-                  >
-                    Cancelar
-                  </button>
-                </div>
-              </form>
+                  <div className="acciones-formulario">
+                    <button type="submit" className="btn-ver-rutina">
+                      {esEdicion ? "Guardar Cambios" : "Guardar y Asignar"}
+                    </button>
+                    <button 
+                      type="button" 
+                      className="btn-cancelar"
+                      onClick={resetearFormulario}
+                    >
+                      Cancelar
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
           )}
 
-          {/* MODAL / VISTA "VER RUTINAS" */}
+          {/* MODAL / VENTANA EMERGENTE: VER RUTINAS */}
           {verRutinaModal && (
-            <div className="tarjeta-formulario modal-ver-rutina" style={{ marginTop: "30px" }}>
-              <div className="encabezado-modal">
-                <h3 className="subtitulo-formulario">Rutinas de {verRutinaModal.nombreAlumno}</h3>
-                <button className="btn-cerrar-modal" onClick={() => setVerRutinaModal(null)}>✖</button>
-              </div>
+            <div className="modal-overlay" onClick={() => setVerRutinaModal(null)}>
+              <div className="tarjeta-formulario modal-contenido" onClick={(e) => e.stopPropagation()}>
+                <div className="encabezado-modal">
+                  <h3 className="subtitulo-formulario">Rutinas de {verRutinaModal.nombreAlumno}</h3>
+                  <button className="btn-cerrar-modal" onClick={() => setVerRutinaModal(null)}>✖</button>
+                </div>
 
-              {cargandoRutina && <p className="texto-secundario">Cargando rutinas...</p>}
+                {cargandoRutina && <p className="texto-secundario">Cargando rutinas...</p>}
 
-              {!cargandoRutina && rutinaAlumno.length === 0 && (
-                <p className="texto-vacio">Este alumno aún no tiene rutinas asignadas.</p>
-              )}
+                {!cargandoRutina && rutinaAlumno.length === 0 && (
+                  <p className="texto-vacio">Este alumno aún no tiene rutinas asignadas.</p>
+                )}
 
-              {!cargandoRutina && rutinaAlumno.length > 0 && (
-                <div className="vista-rutina-agrupada">
-                  {Object.values(agruparPorRutina(rutinaAlumno)).map((grupo) => (
-                    <div key={grupo.rutina_id} className="bloque-musculo-dia" style={{ marginBottom: "20px" }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
-                        <h4 className="titulo-bloque-dia" style={{ margin: 0 }}>
-                          📋 {grupo.nombre_rutina} — 📅 Día: {grupo.dia_asignado}
-                        </h4>
-                        <div style={{ display: "flex", gap: "8px" }}>
-                          <button 
-                            className="btn-editar-rutina"
-                            onClick={() => prepararEdicion(grupo, verRutinaModal.nombreAlumno)}
-                          >
-                            ✏️ Editar
-                          </button>
-                          <button 
-                            className="btn-borrar-rutina"
-                            onClick={() => eliminarRutinaEspecifica(grupo.rutina_id, grupo.nombre_rutina)}
-                          >
-                            🗑️ Borrar Rutina
-                          </button>
+                {!cargandoRutina && rutinaAlumno.length > 0 && (
+                  <div className="vista-rutina-agrupada">
+                    {Object.values(agruparPorRutina(rutinaAlumno)).map((grupo) => (
+                      <div key={grupo.rutina_id} className="bloque-musculo-dia" style={{ marginBottom: "20px" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
+                          <h4 className="titulo-bloque-dia" style={{ margin: 0 }}>
+                            📋 {grupo.nombre_rutina} — 📅 Día: {grupo.dia_asignado}
+                          </h4>
+                          <div style={{ display: "flex", gap: "8px" }}>
+                            <button 
+                              className="btn-editar-rutina"
+                              onClick={() => prepararEdicion(grupo, verRutinaModal.nombreAlumno)}
+                            >
+                              ✏ Editar
+                            </button>
+                            <button 
+                              className="btn-borrar-rutina"
+                              onClick={() => eliminarRutinaEspecifica(grupo.rutina_id, grupo.nombre_rutina)}
+                            >
+                              🗑️ Borrar
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="lista-ejercicios-vista">
+                          {grupo.ejercicios.map((ej, idx) => (
+                            <div key={idx} className="tarjeta-ejercicio-vista">
+                              <div>
+                                <p className="ejercicio-nombre-vista">{ej.nombre_ejercicio}</p>
+                                {ej.descripcion && <p className="ejercicio-desc-vista">{ej.descripcion}</p>}
+                              </div>
+                              <div className="badge-series-reps">
+                                <span>{ej.series} Series</span>
+                                <span>•</span>
+                                <span>{ej.repeticiones} Reps</span>
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       </div>
-
-                      <div className="lista-ejercicios-vista">
-                        {grupo.ejercicios.map((ej, idx) => (
-                          <div key={idx} className="tarjeta-ejercicio-vista">
-                            <div>
-                              <p className="ejercicio-nombre-vista">{ej.nombre_ejercicio}</p>
-                              {ej.descripcion && <p className="ejercicio-desc-vista">{ej.descripcion}</p>}
-                            </div>
-                            <div className="badge-series-reps">
-                              <span>{ej.series} Series</span>
-                              <span>•</span>
-                              <span>{ej.repeticiones} Reps</span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </main>
