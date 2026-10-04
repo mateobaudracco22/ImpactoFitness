@@ -51,6 +51,23 @@ async function inicializarBaseDeDatos() {
         `);
 
         await conexion.query(`
+            CREATE TABLE IF NOT EXISTS Etiquetas_Musculares (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                nombre VARCHAR(100) NOT NULL
+            );
+        `);
+
+        await conexion.query(`
+            CREATE TABLE IF NOT EXISTS Ejercicio_Etiqueta (
+                ejercicio_id INT NOT NULL,
+                etiqueta_id INT NOT NULL,
+                PRIMARY KEY (ejercicio_id, etiqueta_id),
+                FOREIGN KEY (ejercicio_id) REFERENCES Ejercicios(id) ON DELETE CASCADE,
+                FOREIGN KEY (etiqueta_id) REFERENCES Etiquetas_Musculares(id) ON DELETE CASCADE
+            );
+        `);
+
+        await conexion.query(`
             CREATE TABLE IF NOT EXISTS Rutinas (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 usuario_id INT NOT NULL,
@@ -106,7 +123,6 @@ async function inicializarBaseDeDatos() {
                 ('María Gómez', 'maria@gmail.com', '1144556677', 'cardio/perdida_peso', 'cliente', '123456');
             `);
 
-            // Insertar sus solicitudes de rutina para que aparezcan en la vista del instructor
             await conexion.query(`
                 INSERT INTO Solicitudes_Rutina (usuario_id, proposito_solicitado, ejercicios_no_aptos, estado) VALUES
                 (2, 'Aumentar masa muscular y fuerza', 'Dolor en rodilla izquierda', 'Pendiente'),
@@ -115,20 +131,38 @@ async function inicializarBaseDeDatos() {
             console.log('👥 Alumnos de prueba creados (Juan Pérez y María Gómez).');
         }
 
-        // 5. Insertar catálogo de Ejercicios de prueba si está vacío
+        // 5. Insertar catálogo de Ejercicios y Etiquetas de prueba si está vacío
         const [ejercicios] = await conexion.query("SELECT COUNT(*) as total FROM Ejercicios");
         if (ejercicios[0].total === 0) {
             await conexion.query(`
-                INSERT INTO Ejercicios (nombre, descripcion) VALUES
-                ('Press de Banca', 'Pecho y tríceps con barra horizontal'),
-                ('Sentadilla con Barra', 'Cuádriceps y glúteos'),
-                ('Peso Muerto', 'Espalda baja, glúteos e isquiotibiales'),
-                ('Dominadas', 'Dorsales y bíceps'),
-                ('Curl de Bíceps', 'Flexión de codo con mancuernas'),
-                ('Extensión de Tríceps', 'Trabajo en polea alta'),
-                ('Elevaciones Laterales', 'Aislamiento de deltoides lateral');
+                INSERT INTO Etiquetas_Musculares (id, nombre) VALUES
+                (1, 'Pectoral'), (2, 'Tríceps'), (3, 'Cuádriceps'), 
+                (4, 'Glúteos'), (5, 'Espalda'), (6, 'Bíceps'), (7, 'Hombros');
             `);
-            console.log('💪 Ejercicios de prueba insertados.');
+
+            await conexion.query(`
+                INSERT INTO Ejercicios (id, nombre, descripcion) VALUES
+                (1, 'Press de Banca', 'Pecho y tríceps con barra horizontal'),
+                (2, 'Sentadilla con Barra', 'Cuádriceps y glúteos'),
+                (3, 'Peso Muerto', 'Espalda baja, glúteos e isquiotibiales'),
+                (4, 'Dominadas', 'Dorsales y bíceps'),
+                (5, 'Curl de Bíceps', 'Flexión de codo con mancuernas'),
+                (6, 'Extensión de Tríceps', 'Trabajo en polea alta'),
+                (7, 'Elevaciones Laterales', 'Aislamiento de deltoides lateral');
+            `);
+
+            await conexion.query(`
+                INSERT INTO Ejercicio_Etiqueta (ejercicio_id, etiqueta_id) VALUES
+                (1, 1), (1, 2),
+                (2, 3), (2, 4),
+                (3, 4), (3, 5),
+                (4, 5), (4, 6),
+                (5, 6),
+                (6, 2),
+                (7, 7);
+            `);
+
+            console.log('💪 Ejercicios y etiquetas de prueba insertados.');
         }
 
         console.log('✅ Base de datos "impacto_fitness" inicializada correctamente.');
@@ -209,11 +243,30 @@ app.put('/api/alumnos/:id/asignar', async (req, res) => {
     }
 });
 
-// Obtener catálogo de ejercicios
+// Obtener catálogo de ejercicios con sus etiquetas musculares
 app.get('/api/ejercicios', async (req, res) => {
     try {
-        const [ejercicios] = await db.query("SELECT * FROM Ejercicios");
-        res.json(ejercicios);
+        const consulta = `
+            SELECT 
+                e.id, 
+                e.nombre, 
+                e.descripcion, 
+                e.url_gif_demostrativo,
+                GROUP_CONCAT(em.nombre SEPARATOR ',') AS etiquetas
+            FROM Ejercicios e
+            LEFT JOIN Ejercicio_Etiqueta ee ON e.id = ee.ejercicio_id
+            LEFT JOIN Etiquetas_Musculares em ON ee.etiqueta_id = em.id
+            GROUP BY e.id
+        `;
+        
+        const [filas] = await db.query(consulta);
+
+        const resultado = filas.map(ejercicio => ({
+            ...ejercicio,
+            etiquetas: ejercicio.etiquetas ? ejercicio.etiquetas.split(',') : []
+        }));
+
+        res.json(resultado);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
