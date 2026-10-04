@@ -276,7 +276,7 @@ app.get('/api/ejercicios', async (req, res) => {
 app.get('/api/rutinas/usuario/:usuario_id', async (req, res) => {
     const { usuario_id } = req.params;
     try {
-        const [rutinas] = await db.query(`
+        const [filas] = await db.query(`
             SELECT r.id AS rutina_id, r.nombre_rutina, r.proposito, r.dia_asignado,
                    re.ejercicio_id, re.series, re.repeticiones, re.orden,
                    e.nombre AS nombre_ejercicio, e.descripcion, e.url_gif_demostrativo
@@ -287,7 +287,40 @@ app.get('/api/rutinas/usuario/:usuario_id', async (req, res) => {
             ORDER BY r.dia_asignado, re.orden
         `, [usuario_id]);
 
-        res.json(rutinas);
+        // Agrupar los resultados planos en un array de rutinas con sus ejercicios anidados
+        const rutinasAgrupadas = filas.reduce((acumulador, fila) => {
+            // Buscar si la rutina ya existe en el acumulador
+            let rutina = acumulador.find(r => r.rutina_id === fila.rutina_id);
+            
+            // Si no existe, la creamos con un arreglo vacío para los ejercicios
+            if (!rutina) {
+                rutina = {
+                    rutina_id: fila.rutina_id,
+                    nombre_rutina: fila.nombre_rutina,
+                    proposito: fila.proposito,
+                    dia_asignado: fila.dia_asignado,
+                    ejercicios: []
+                };
+                acumulador.push(rutina);
+            }
+
+            // Si la fila tiene un ejercicio asociado, lo agregamos al arreglo de la rutina
+            if (fila.ejercicio_id) {
+                rutina.ejercicios.push({
+                    ejercicio_id: fila.ejercicio_id,
+                    series: fila.series,
+                    repeticiones: fila.repeticiones,
+                    orden: fila.orden,
+                    nombre_ejercicio: fila.nombre_ejercicio,
+                    descripcion: fila.descripcion,
+                    url_gif_demostrativo: fila.url_gif_demostrativo
+                });
+            }
+
+            return acumulador;
+        }, []);
+
+        res.json(rutinasAgrupadas);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
