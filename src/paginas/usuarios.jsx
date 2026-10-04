@@ -7,17 +7,18 @@ function MisRutinas() {
   const [rutinasAgrupadas, setRutinasAgrupadas] = useState({});
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
+
+  const [rutinaSeleccionada, setRutinaSeleccionada] = useState(null);
+  
   const navigate = useNavigate();
 
   useEffect(() => {
-    // 1. Obtener el usuario logueado
     const usuarioGuardado = localStorage.getItem("usuario");
     if (usuarioGuardado) {
       const user = JSON.parse(usuarioGuardado);
       setUsuario(user);
       obtenerMisRutinas(user.id);
     } else {
-      // Si no hay usuario, redirigir al login
       navigate("/");
     }
   }, [navigate]);
@@ -29,7 +30,6 @@ function MisRutinas() {
       
       const datos = await respuesta.json();
       
-      // 2. Transformar los datos planos agrupándolos primero por DÍA y luego por RUTINA
       const agrupado = datos.reduce((acc, item) => {
         const dia = item.dia_asignado || "Sin asignar";
         const idRutina = item.rutina_id;
@@ -69,7 +69,6 @@ function MisRutinas() {
 
   return (
     <div className="layout-usuario">
-      {/* SIDEBAR LATERAL (Basado en el diseño) */}
       <aside className="sidebar">
         <div className="perfil-info">
           <div className="avatar-circulo">👤</div>
@@ -87,7 +86,6 @@ function MisRutinas() {
         </div>
       </aside>
 
-      {/* CONTENIDO PRINCIPAL */}
       <main className="contenido-principal">
         <header className="cabecera-seccion">
           <h1>Mis Rutinas Asignadas</h1>
@@ -114,7 +112,12 @@ function MisRutinas() {
                         <h3 className="rutina-nombre">{rutina.nombre_rutina}</h3>
                         <p className="rutina-instructor">Objetivo: {rutina.proposito}</p>
                       </div>
-                      <button className="btn-ver-detalle">Ver Detalle</button>
+                      <button 
+                        className="btn-ver-detalle"
+                        onClick={() => setRutinaSeleccionada(rutina)}
+                      >
+                        Ver Detalle
+                      </button>
                     </div>
 
                     <ul className="lista-ejercicios">
@@ -131,6 +134,34 @@ function MisRutinas() {
             </div>
           ))}
         </div>
+
+        {rutinaSeleccionada && (
+          <div className="modal-overlay-usuario" onClick={() => setRutinaSeleccionada(null)}>
+            <div className="modal-content-usuario" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header-usuario">
+                <h2>{rutinaSeleccionada.nombre_rutina}</h2>
+                <button className="btn-close-modal" onClick={() => setRutinaSeleccionada(null)}>✖</button>
+              </div>
+              <p className="modal-proposito"><strong>Objetivo:</strong> {rutinaSeleccionada.proposito}</p>
+              
+              <div className="modal-body-usuario">
+                {rutinaSeleccionada.ejercicios.length === 0 ? (
+                  <p>No hay ejercicios detallados para esta rutina.</p>
+                ) : (
+                  rutinaSeleccionada.ejercicios.map((ej, idx) => (
+                    <div key={idx} className="ejercicio-detalle-item">
+                      <div className="ejercicio-numero">{idx + 1}</div>
+                      <div className="ejercicio-info">
+                        <h4>{ej.nombre}</h4>
+                        <p>{ej.series} Series × {ej.repeticiones} Repeticiones</p>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );
