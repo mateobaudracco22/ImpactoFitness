@@ -1,0 +1,197 @@
+/* Variables de color basadas en tu diseño */
+:root {
+  --bg-app: #121212;
+  --bg-sidebar: #1a1a1a;
+  --bg-card: #242424;
+  --text-primary: #ffffff;
+  --text-secondary: #aaaaaa;
+  --accent-orange: #ff5722;
+  --border-color: #333333;
+}
+
+/* Layout General */
+.layout-usuario {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--bg-app);
+  color: var(--text-primary);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 250px;
+  background-color: var(--bg-sidebar);
+  border-right: 1px solid var(--border-color);
+  padding: 30px 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.perfil-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.avatar-circulo {
+  width: 80px;
+  height: 80px;
+  background-color: #444;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  margin-bottom: 15px;
+}
+
+.perfil-info h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+/* Menú Sidebar */
+.menu-navegacion {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex-grow: 1;
+}
+
+.menu-item {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  text-align: left;
+  padding: 12px 15px;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.menu-item:hover {
+  color: var(--text-primary);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.menu-item.activo {
+  background-color: var(--accent-orange);
+  color: white;
+  font-weight: bold;
+}
+
+.menu-footer {
+  margin-top: auto;
+}
+
+/* Contenido Principal */
+.contenido-principal {
+  flex-grow: 1;
+  padding: 40px 50px;
+  overflow-y: auto;
+}
+
+.cabecera-seccion h1 {
+  font-size: 32px;
+  margin: 0 0 10px 0;
+}
+
+.cabecera-seccion p {
+  color: var(--text-secondary);
+  margin: 0 0 40px 0;
+  font-size: 16px;
+}
+
+/* Bloques de Días */
+.bloque-dia {
+  margin-bottom: 40px;
+}
+
+.titulo-dia {
+  color: var(--accent-orange);
+  font-size: 20px;
+  border: 1px solid var(--accent-orange);
+  border-radius: 8px;
+  padding: 10px 20px;
+  display: inline-block;
+  margin-bottom: 20px;
+  font-weight: 600;
+  background-color: rgba(255, 87, 34, 0.05);
+}
+
+/* Tarjetas de Rutina */
+.grid-tarjetas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 20px;
+}
+
+.tarjeta-rutina {
+  background-color: var(--bg-card);
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid var(--border-color);
+}
+
+.tarjeta-cabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.rutina-nombre {
+  margin: 0 0 5px 0;
+  font-size: 18px;
+}
+
+.rutina-instructor {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.btn-ver-detalle {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--text-secondary);
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-ver-detalle:hover {
+  border-color: var(--accent-orange);
+  color: var(--accent-orange);
+}
+
+/* Lista de ejercicios */
+.lista-ejercicios {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.lista-ejercicios li {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+/* Textos de estado */
+.cargando-texto, .error-texto, .vacio-texto {
+  font-size: 18px;
+  color: var(--text-secondary);
+  margin-top: 20px;
+}
+.error-texto {
+  color: #ff5252;
+}
