@@ -41,7 +41,8 @@ function Login({ onLoginExitoso }) {
       if (datos.usuario.rol === "instructor") {
         navigate("/instructor");
       } else {
-        navigate("/informacion");
+        // Redirige a los alumnos a su panel de rutinas
+        navigate("/usuarios"); 
       }
     } catch (err) {
       setError("No se pudo conectar con el servidor. Verifica que esté encendido.");
