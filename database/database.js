@@ -399,6 +399,37 @@ app.delete('/api/rutinas/:id', async (req, res) => {
     }
 });
 
+// Obtener las opciones de metas (NUEVO)
+app.get('/api/metas', (req, res) => {
+    res.json([
+        { id: 'musculacion/fuerza', nombre: 'Ganar Músculo' },
+        { id: 'cardio/perdida_peso', nombre: 'Perder Peso' },
+        { id: 'clases/funcional', nombre: 'Resistencia / Cardio' }
+    ]);
+});
+
+// Actualizar la meta de un usuario (NUEVO)
+app.put('/api/usuarios/:id/meta', async (req, res) => {
+    const usuarioId = req.params.id;
+    // Asegúrate de que tu frontend manda la propiedad 'objetivo' en el body
+    const { objetivo } = req.body; 
+
+    try {
+        const [resultado] = await db.query(
+            'UPDATE Usuarios SET objetivo = ? WHERE id = ?',
+            [objetivo, usuarioId]
+        );
+
+        if (resultado.affectedRows === 0) {
+            return res.status(404).json({ error: 'Usuario no encontrado.' });
+        }
+
+        res.json({ mensaje: 'Meta actualizada correctamente.' });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al actualizar la meta en la base de datos.' });
+    }
+});
+
 // --- ARRANCAR EL SERVIDOR ---
 inicializarBaseDeDatos().then((conexion) => {
     if (conexion) {
