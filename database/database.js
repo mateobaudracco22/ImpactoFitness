@@ -206,7 +206,9 @@ app.get('/api/solicitudes', async (req, res) => {
                 u.id AS usuario_id,
                 u.nombre_completo,
                 u.email,
-                u.objetivo,
+                u.meta_id,
+                m.nombre AS meta_nombre,
+                m.icono AS meta_icono,
                 u.instructor_id,
                 s.id AS solicitud_id,
                 s.proposito_solicitado,
@@ -214,6 +216,7 @@ app.get('/api/solicitudes', async (req, res) => {
                 s.estado
             FROM Usuarios u
             LEFT JOIN Solicitudes_Rutina s ON u.id = s.usuario_id
+            LEFT JOIN metas m ON u.meta_id = m.id
             WHERE u.rol = 'cliente'
         `);
         res.json(solicitudes);

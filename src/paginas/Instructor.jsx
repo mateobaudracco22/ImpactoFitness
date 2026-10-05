@@ -216,20 +216,27 @@ function Instructor() {
             {misAlumnos.map((alumno) => {
               const idAlumno = alumno.usuario_id || alumno.id;
               return (
-                <div key={idAlumno} className="alumno-card">
-                  <div className="alumno-info">
+                <div className="alumno-info">
                     <h3 className="alumno-nombre">{alumno.nombre_completo}</h3>
-                    <p className="alumno-rutina"><strong>Meta:</strong> {alumno.meta_icono || "🎯"} {alumno.meta_nombre || "General"}</p>
+                    
+                    {/* Tarjeta de Meta */}
+                    <div style={{ 
+                    display: "inline-flex", 
+                    alignItems: "center", 
+                    gap: "6px", 
+                    backgroundColor: "#2a2a36", 
+                    padding: "4px 10px", 
+                    borderRadius: "15px", 
+                    fontSize: "0.8rem", 
+                    color: "#b0b0c0", 
+                    margin: "5px 0", 
+                    border: "1px solid #3f3f4e" 
+                  }}>
+                    <span>{al.meta_icono || "🎯"}</span>
+                    <span style={{ color: "#fff", fontWeight: "500" }}>{al.meta_nombre || "General"}</span>
                   </div>
-                  <div className="contenedor-botones-card">
-                    <button className="btn-secundario" onClick={() => consultarRutinaAlumno(idAlumno, alumno.nombre_completo)}>👁️️ Ver Rutinas</button>
-                    <button className="btn-ver-rutina" onClick={() => {
-                      resetearFormulario();
-                      setSolicitudSeleccionada({ ...alumno, usuario_id: idAlumno });
-                      setNombreRutina(`Rutina de ${alumno.nombre_completo}`);
-                    }}>➕ Armar Rutina</button>
+
                   </div>
-                </div>
               );
             })}
           </div>
