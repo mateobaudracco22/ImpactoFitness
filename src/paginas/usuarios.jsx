@@ -36,29 +36,20 @@ function MisRutinas() {
       const respuesta = await fetch(`http://localhost:3000/api/rutinas/usuario/${idUsuario}`);
       if (!respuesta.ok) throw new Error("Error al obtener las rutinas");
       
-      const datos = await respuesta.json();
+      const datos = await respuesta.json(); // La API devuelve un array agrupado por rutina
       
       const agrupado = datos.reduce((acc, item) => {
         const dia = item.dia_asignado || "Sin asignar";
-        const idRutina = item.rutina_id;
 
-        if (!acc[dia]) acc[dia] = {};
-        if (!acc[dia][idRutina]) {
-          acc[dia][idRutina] = {
-            id: idRutina,
-            nombre_rutina: item.nombre_rutina,
-            proposito: item.proposito,
-            ejercicios: []
-          };
-        }
+        if (!acc[dia]) acc[dia] = [];
+        
+        acc[dia].push({
+          id: item.rutina_id,
+          nombre_rutina: item.nombre_rutina,
+          proposito: item.proposito,
+          ejercicios: item.ejercicios || []
+        });
 
-        if (item.nombre_ejercicio) {
-          acc[dia][idRutina].ejercicios.push({
-            nombre: item.nombre_ejercicio,
-            series: item.series,
-            repeticiones: item.repeticiones
-          });
-        }
         return acc;
       }, {});
 
@@ -167,7 +158,7 @@ function MisRutinas() {
 
         <div className="menu-footer">
           <button className="menu-item salir" onClick={handleCerrarSesion}>
-            ↪ Log Out
+            ↪ Cerrar Sesión
           </button>
         </div>
       </aside>
@@ -195,7 +186,7 @@ function MisRutinas() {
                   <h2 className="titulo-dia">{dia}</h2>
                   
                   <div className="grid-tarjetas">
-                    {Object.values(rutinasAgrupadas[dia]).map((rutina) => (
+                    {rutinasAgrupadas[dia].map((rutina) => (
                       <div key={rutina.id} className="tarjeta-rutina">
                         <div className="tarjeta-cabecera">
                           <div>
@@ -214,7 +205,7 @@ function MisRutinas() {
                           {rutina.ejercicios.length === 0 && <li>Sin ejercicios asignados.</li>}
                           {rutina.ejercicios.map((ej, index) => (
                             <li key={index}>
-                              Ejercicio {index + 1}: {ej.nombre} - {ej.series} sets x {ej.repeticiones} reps
+                              Ejercicio {index + 1}: {ej.nombre_ejercicio} - {ej.series} sets x {ej.repeticiones} reps
                             </li>
                           ))}
                         </ul>
@@ -276,7 +267,7 @@ function MisRutinas() {
                     <div key={idx} className="ejercicio-detalle-item">
                       <div className="ejercicio-numero">{idx + 1}</div>
                       <div className="ejercicio-info">
-                        <h4>{ej.nombre}</h4>
+                        <h4>{ej.nombre_ejercicio}</h4>
                         <p>{ej.series} Series × {ej.repeticiones} Repeticiones</p>
                       </div>
                     </div>

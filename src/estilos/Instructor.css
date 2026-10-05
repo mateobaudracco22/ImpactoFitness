@@ -292,3 +292,23 @@
 .ejercicio-nombre-vista { margin: 0; font-weight: 600; color: #fff; }
 .ejercicio-desc-vista { margin: 2px 0 0; font-size: 0.8rem; color: var(--texto-gris); }
 .badge-series-reps { background-color: rgba(255, 87, 34, 0.2); color: var(--detalle-brillo); padding: 4px 10px; border-radius: 12px; font-size: 0.85rem; font-weight: bold; }
+
+/* Botón de Cerrar Sesión Estilizado */
+.btn-cerrar-sesion {
+  background: transparent;
+  color: var(--acento-principal);
+  border: 2px solid var(--acento-principal);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-cerrar-sesion:hover {
+  background-color: var(--acento-principal);
+  color: var(--texto-blanco);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 87, 34, 0.3);
+}
