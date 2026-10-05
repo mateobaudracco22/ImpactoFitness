@@ -41,15 +41,17 @@ function Instructor() {
 
   const cargarDatos = async (instructorId) => {
     try {
-      const [resSolicitudes, resEjercicios] = await Promise.all([
+      const [resSolicitudes, resMisAlumnos, resEjercicios] = await Promise.all([
         fetch("http://localhost:3000/api/solicitudes"),
+        fetch(`http://localhost:3000/api/instructores/${instructorId}/alumnos`),
         fetch("http://localhost:3000/api/ejercicios")
       ]);
       const datosSolicitudes = await resSolicitudes.json();
+      const datosMisAlumnos = await resMisAlumnos.json();
       const datosEjercicios = await resEjercicios.json();
 
-      setAlumnosLibres(datosSolicitudes.filter(s => !s.instructor_id));
-      setMisAlumnos(datosSolicitudes.filter(s => Number(s.instructor_id) === Number(instructorId)));
+      setAlumnosLibres(datosSolicitudes);
+      setMisAlumnos(datosMisAlumnos);
       setEjerciciosDisponibles(datosEjercicios);
     } catch (err) {
       console.error("Error al cargar datos:", err);

@@ -93,17 +93,6 @@ async function inicializarBaseDeDatos() {
             );
         `);
 
-        await conexion.query(`
-            CREATE TABLE IF NOT EXISTS Solicitudes_Rutina (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                usuario_id INT NOT NULL,
-                proposito_solicitado TEXT,
-                ejercicios_no_aptos TEXT,
-                estado ENUM('Pendiente', 'Completada') DEFAULT 'Pendiente',
-                FOREIGN KEY (usuario_id) REFERENCES Usuarios(id) ON DELETE CASCADE
-            );
-        `);
-
         // 3. Insertar Profesor de prueba si no existe
         const [instructores] = await conexion.query("SELECT * FROM Usuarios WHERE rol = 'instructor'");
         if (instructores.length === 0) {
@@ -121,12 +110,6 @@ async function inicializarBaseDeDatos() {
                 INSERT INTO Usuarios (nombre_completo, email, telefono, objetivo, rol, password_hash) VALUES
                 ('Juan Pérez', 'juan@gmail.com', '1199887766', 'musculacion/fuerza', 'cliente', '123456'),
                 ('María Gómez', 'maria@gmail.com', '1144556677', 'cardio/perdida_peso', 'cliente', '123456');
-            `);
-
-            await conexion.query(`
-                INSERT INTO Solicitudes_Rutina (usuario_id, proposito_solicitado, ejercicios_no_aptos, estado) VALUES
-                (2, 'Aumentar masa muscular y fuerza', 'Dolor en rodilla izquierda', 'Pendiente'),
-                (3, 'Bajar de peso y resistencia cardiovascular', 'Ninguna', 'Pendiente');
             `);
             console.log('👥 Alumnos de prueba creados (Juan Pérez y María Gómez).');
         }
@@ -201,7 +184,7 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-// Obtener todas las solicitudes / alumnos cliente
+// Obtener alumnos clientes sin instructor asignado (filtra exclusivamente por instructor_id NULL o 0)
 app.get('/api/solicitudes', async (req, res) => {
     try {
         const [solicitudes] = await db.query(`
@@ -212,15 +195,11 @@ app.get('/api/solicitudes', async (req, res) => {
                 u.meta_id,
                 m.nombre AS meta_nombre,
                 m.icono AS meta_icono,
-                u.instructor_id,
-                s.id AS solicitud_id,
-                s.proposito_solicitado,
-                s.ejercicios_no_aptos,
-                s.estado
+                u.instructor_id
             FROM Usuarios u
-            LEFT JOIN Solicitudes_Rutina s ON u.id = s.usuario_id
             LEFT JOIN metas m ON u.meta_id = m.id
-            WHERE u.rol = 'cliente'
+            WHERE u.rol = 'cliente' 
+            AND (u.instructor_id IS NULL OR u.instructor_id = 0)
         `);
         res.json(solicitudes);
     } catch (error) {
@@ -228,7 +207,7 @@ app.get('/api/solicitudes', async (req, res) => {
     }
 });
 
-// Asignar un alumno a un instructor
+// Asignar un alumno a un instructor (al asignarlo, su instructor_id deja de ser NULL y sale de la lista)
 app.put('/api/alumnos/:id/asignar', async (req, res) => {
     const alumnoId = req.params.id;
     const { instructor_id } = req.body;
@@ -278,6 +257,22 @@ app.get('/api/ejercicios', async (req, res) => {
     }
 });
 
+// Endpoint de Registro para nuevos usuarios
+app.post('/api/registro', async (req, res) => {
+    const { nombre_completo, email, telefono, meta_id, password, rol } = req.body;
+    try {
+        const [resultado] = await db.query(
+            `INSERT INTO Usuarios (nombre_completo, email, telefono, meta_id, password_hash, rol, instructor_id) 
+             VALUES (?, ?, ?, ?, ?, ?, NULL)`,
+            [nombre_completo, email, telefono, meta_id || null, password, rol || 'cliente']
+        );
+
+        res.status(201).json({ mensaje: 'Usuario registrado con éxito', id: resultado.insertId });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // Obtener rutinas de un alumno
 app.get('/api/rutinas/usuario/:usuario_id', async (req, res) => {
     const { usuario_id } = req.params;
@@ -293,12 +288,9 @@ app.get('/api/rutinas/usuario/:usuario_id', async (req, res) => {
             ORDER BY r.dia_asignado, re.orden
         `, [usuario_id]);
 
-        // Agrupar los resultados planos en un array de rutinas con sus ejercicios anidados
         const rutinasAgrupadas = filas.reduce((acumulador, fila) => {
-            // Buscar si la rutina ya existe en el acumulador
             let rutina = acumulador.find(r => r.rutina_id === fila.rutina_id);
             
-            // Si no existe, la creamos con un arreglo vacío para los ejercicios
             if (!rutina) {
                 rutina = {
                     rutina_id: fila.rutina_id,
@@ -310,7 +302,6 @@ app.get('/api/rutinas/usuario/:usuario_id', async (req, res) => {
                 acumulador.push(rutina);
             }
 
-            // Si la fila tiene un ejercicio asociado, lo agregamos al arreglo de la rutina
             if (fila.ejercicio_id) {
                 rutina.ejercicios.push({
                     ejercicio_id: fila.ejercicio_id,
@@ -418,7 +409,6 @@ app.get('/api/metas', async (req, res) => {
 // Actualizar la meta de un usuario
 app.put('/api/usuarios/:id/meta', async (req, res) => {
     const usuarioId = req.params.id;
-    // Recibimos el 'meta_id' que manda usuarios.jsx
     const { meta_id } = req.body; 
 
     try {
@@ -434,6 +424,29 @@ app.put('/api/usuarios/:id/meta', async (req, res) => {
         res.json({ mensaje: 'Meta actualizada correctamente.' });
     } catch (error) {
         res.status(500).json({ error: 'Error al actualizar la meta en la base de datos.' });
+    }
+});
+
+// Obtener los alumnos asignados a un instructor específico
+app.get('/api/instructores/:instructor_id/alumnos', async (req, res) => {
+    const { instructor_id } = req.params;
+    try {
+        const [alumnos] = await db.query(`
+            SELECT 
+                u.id AS usuario_id,
+                u.nombre_completo,
+                u.email,
+                u.meta_id,
+                m.nombre AS meta_nombre,
+                m.icono AS meta_icono,
+                u.instructor_id
+            FROM Usuarios u
+            LEFT JOIN metas m ON u.meta_id = m.id
+            WHERE u.instructor_id = ?
+        `, [instructor_id]);
+        res.json(alumnos);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
     }
 });
 
