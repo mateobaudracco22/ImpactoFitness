@@ -34,6 +34,11 @@ function Instructor() {
     }
   }, []);
 
+  const cerrarSesion = () => {
+    localStorage.removeItem("usuario");
+    window.location.href = "/"; // Ajusta la ruta de redirección si usas React Router (ej. navigate("/login"))
+  };
+
   const cargarDatos = async (instructorId) => {
     try {
       const [resSolicitudes, resEjercicios] = await Promise.all([
@@ -213,9 +218,14 @@ function Instructor() {
       )}
 
       <div className="instructor-content">
-        <header className="header-card">
-          <h1 className="header-title">Panel del Instructor</h1>
-          <p className="header-subtitle">{instructor ? `Bienvenido/a, ${instructor.nombre_completo}` : ""}</p>
+        <header className="header-card" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", textAlign: "left" }}>
+          <div>
+            <h1 className="header-title">Panel del Instructor</h1>
+            <p className="header-subtitle">{instructor ? `Bienvenido/a, ${instructor.nombre_completo}` : ""}</p>
+          </div>
+          <button className="btn-cerrar-sesion" onClick={cerrarSesion}>
+            Cerrar Sesión 🚪
+          </button>
         </header>
 
         <section className="metrics-grid">
@@ -332,7 +342,7 @@ function Instructor() {
             <div className="modal-overlay-ejercicios" onClick={() => setModalEjerciciosAbierto(false)}>
               <div className="modal-contenido-ejercicios" onClick={(e) => e.stopPropagation()}>
                 <div className="encabezado-modal">
-                  <h3>🏋️️ Catálogo de Ejercicios por Músculo</h3>
+                  <h3>🏋 Catálogo de Ejercicios por Músculo</h3>
                   <button className="btn-cerrar-modal" onClick={() => setModalEjerciciosAbierto(false)}>✖</button>
                 </div>
                 <div className="contenedor-burbujas-filtro">
