@@ -184,7 +184,10 @@ app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
     try {
         const [usuarios] = await db.query(
-            "SELECT id, nombre_completo, email, rol, objetivo FROM Usuarios WHERE email = ? AND password_hash = ?",
+            `SELECT u.id, u.nombre_completo, u.email, u.rol, u.objetivo, u.meta_id, m.nombre AS meta_nombre, m.icono AS meta_icono 
+             FROM Usuarios u 
+             LEFT JOIN metas m ON u.meta_id = m.id 
+             WHERE u.email = ? AND u.password_hash = ?`,
             [email, password]
         );
 
