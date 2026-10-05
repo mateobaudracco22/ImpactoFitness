@@ -51,6 +51,23 @@ async function inicializarBaseDeDatos() {
         `);
 
         await conexion.query(`
+            CREATE TABLE IF NOT EXISTS Etiquetas_Musculares (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                nombre VARCHAR(100) NOT NULL
+            );
+        `);
+
+        await conexion.query(`
+            CREATE TABLE IF NOT EXISTS Ejercicio_Etiqueta (
+                ejercicio_id INT NOT NULL,
+                etiqueta_id INT NOT NULL,
+                PRIMARY KEY (ejercicio_id, etiqueta_id),
+                FOREIGN KEY (ejercicio_id) REFERENCES Ejercicios(id) ON DELETE CASCADE,
+                FOREIGN KEY (etiqueta_id) REFERENCES Etiquetas_Musculares(id) ON DELETE CASCADE
+            );
+        `);
+
+        await conexion.query(`
             CREATE TABLE IF NOT EXISTS Rutinas (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 usuario_id INT NOT NULL,
@@ -106,7 +123,6 @@ async function inicializarBaseDeDatos() {
                 ('María Gómez', 'maria@gmail.com', '1144556677', 'cardio/perdida_peso', 'cliente', '123456');
             `);
 
-            // Insertar sus solicitudes de rutina para que aparezcan en la vista del instructor
             await conexion.query(`
                 INSERT INTO Solicitudes_Rutina (usuario_id, proposito_solicitado, ejercicios_no_aptos, estado) VALUES
                 (2, 'Aumentar masa muscular y fuerza', 'Dolor en rodilla izquierda', 'Pendiente'),
@@ -115,20 +131,38 @@ async function inicializarBaseDeDatos() {
             console.log('👥 Alumnos de prueba creados (Juan Pérez y María Gómez).');
         }
 
-        // 5. Insertar catálogo de Ejercicios de prueba si está vacío
+        // 5. Insertar catálogo de Ejercicios y Etiquetas de prueba si está vacío
         const [ejercicios] = await conexion.query("SELECT COUNT(*) as total FROM Ejercicios");
         if (ejercicios[0].total === 0) {
             await conexion.query(`
-                INSERT INTO Ejercicios (nombre, descripcion) VALUES
-                ('Press de Banca', 'Pecho y tríceps con barra horizontal'),
-                ('Sentadilla con Barra', 'Cuádriceps y glúteos'),
-                ('Peso Muerto', 'Espalda baja, glúteos e isquiotibiales'),
-                ('Dominadas', 'Dorsales y bíceps'),
-                ('Curl de Bíceps', 'Flexión de codo con mancuernas'),
-                ('Extensión de Tríceps', 'Trabajo en polea alta'),
-                ('Elevaciones Laterales', 'Aislamiento de deltoides lateral');
+                INSERT INTO Etiquetas_Musculares (id, nombre) VALUES
+                (1, 'Pectoral'), (2, 'Tríceps'), (3, 'Cuádriceps'), 
+                (4, 'Glúteos'), (5, 'Espalda'), (6, 'Bíceps'), (7, 'Hombros');
             `);
-            console.log('💪 Ejercicios de prueba insertados.');
+
+            await conexion.query(`
+                INSERT INTO Ejercicios (id, nombre, descripcion) VALUES
+                (1, 'Press de Banca', 'Pecho y tríceps con barra horizontal'),
+                (2, 'Sentadilla con Barra', 'Cuádriceps y glúteos'),
+                (3, 'Peso Muerto', 'Espalda baja, glúteos e isquiotibiales'),
+                (4, 'Dominadas', 'Dorsales y bíceps'),
+                (5, 'Curl de Bíceps', 'Flexión de codo con mancuernas'),
+                (6, 'Extensión de Tríceps', 'Trabajo en polea alta'),
+                (7, 'Elevaciones Laterales', 'Aislamiento de deltoides lateral');
+            `);
+
+            await conexion.query(`
+                INSERT INTO Ejercicio_Etiqueta (ejercicio_id, etiqueta_id) VALUES
+                (1, 1), (1, 2),
+                (2, 3), (2, 4),
+                (3, 4), (3, 5),
+                (4, 5), (4, 6),
+                (5, 6),
+                (6, 2),
+                (7, 7);
+            `);
+
+            console.log('💪 Ejercicios y etiquetas de prueba insertados.');
         }
 
         console.log('✅ Base de datos "impacto_fitness" inicializada correctamente.');
@@ -172,7 +206,9 @@ app.get('/api/solicitudes', async (req, res) => {
                 u.id AS usuario_id,
                 u.nombre_completo,
                 u.email,
-                u.objetivo,
+                u.meta_id,
+                m.nombre AS meta_nombre,
+                m.icono AS meta_icono,
                 u.instructor_id,
                 s.id AS solicitud_id,
                 s.proposito_solicitado,
@@ -180,6 +216,7 @@ app.get('/api/solicitudes', async (req, res) => {
                 s.estado
             FROM Usuarios u
             LEFT JOIN Solicitudes_Rutina s ON u.id = s.usuario_id
+            LEFT JOIN metas m ON u.meta_id = m.id
             WHERE u.rol = 'cliente'
         `);
         res.json(solicitudes);
@@ -209,11 +246,30 @@ app.put('/api/alumnos/:id/asignar', async (req, res) => {
     }
 });
 
-// Obtener catálogo de ejercicios
+// Obtener catálogo de ejercicios con sus etiquetas musculares
 app.get('/api/ejercicios', async (req, res) => {
     try {
-        const [ejercicios] = await db.query("SELECT * FROM Ejercicios");
-        res.json(ejercicios);
+        const consulta = `
+            SELECT 
+                e.id, 
+                e.nombre, 
+                e.descripcion, 
+                e.url_gif_demostrativo,
+                GROUP_CONCAT(em.nombre SEPARATOR ',') AS etiquetas
+            FROM Ejercicios e
+            LEFT JOIN Ejercicio_Etiqueta ee ON e.id = ee.ejercicio_id
+            LEFT JOIN Etiquetas_Musculares em ON ee.etiqueta_id = em.id
+            GROUP BY e.id
+        `;
+        
+        const [filas] = await db.query(consulta);
+
+        const resultado = filas.map(ejercicio => ({
+            ...ejercicio,
+            etiquetas: ejercicio.etiquetas ? ejercicio.etiquetas.split(',') : []
+        }));
+
+        res.json(resultado);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -223,7 +279,7 @@ app.get('/api/ejercicios', async (req, res) => {
 app.get('/api/rutinas/usuario/:usuario_id', async (req, res) => {
     const { usuario_id } = req.params;
     try {
-        const [rutinas] = await db.query(`
+        const [filas] = await db.query(`
             SELECT r.id AS rutina_id, r.nombre_rutina, r.proposito, r.dia_asignado,
                    re.ejercicio_id, re.series, re.repeticiones, re.orden,
                    e.nombre AS nombre_ejercicio, e.descripcion, e.url_gif_demostrativo
@@ -234,7 +290,40 @@ app.get('/api/rutinas/usuario/:usuario_id', async (req, res) => {
             ORDER BY r.dia_asignado, re.orden
         `, [usuario_id]);
 
-        res.json(rutinas);
+        // Agrupar los resultados planos en un array de rutinas con sus ejercicios anidados
+        const rutinasAgrupadas = filas.reduce((acumulador, fila) => {
+            // Buscar si la rutina ya existe en el acumulador
+            let rutina = acumulador.find(r => r.rutina_id === fila.rutina_id);
+            
+            // Si no existe, la creamos con un arreglo vacío para los ejercicios
+            if (!rutina) {
+                rutina = {
+                    rutina_id: fila.rutina_id,
+                    nombre_rutina: fila.nombre_rutina,
+                    proposito: fila.proposito,
+                    dia_asignado: fila.dia_asignado,
+                    ejercicios: []
+                };
+                acumulador.push(rutina);
+            }
+
+            // Si la fila tiene un ejercicio asociado, lo agregamos al arreglo de la rutina
+            if (fila.ejercicio_id) {
+                rutina.ejercicios.push({
+                    ejercicio_id: fila.ejercicio_id,
+                    series: fila.series,
+                    repeticiones: fila.repeticiones,
+                    orden: fila.orden,
+                    nombre_ejercicio: fila.nombre_ejercicio,
+                    descripcion: fila.descripcion,
+                    url_gif_demostrativo: fila.url_gif_demostrativo
+                });
+            }
+
+            return acumulador;
+        }, []);
+
+        res.json(rutinasAgrupadas);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -310,6 +399,38 @@ app.delete('/api/rutinas/:id', async (req, res) => {
         res.json({ mensaje: 'Rutina eliminada correctamente' });
     } catch (error) {
         res.status(500).json({ error: 'Error al borrar la rutina.' });
+    }
+});
+
+// Obtener las opciones de metas
+app.get('/api/metas', async (req, res) => {
+    try {
+        const [metas] = await db.query('SELECT * FROM metas');
+        res.json(metas);
+    } catch (error) {
+        res.status(500).json({ error: 'Error al obtener las metas de la base de datos.' });
+    }
+});
+
+// Actualizar la meta de un usuario
+app.put('/api/usuarios/:id/meta', async (req, res) => {
+    const usuarioId = req.params.id;
+    // Recibimos el 'meta_id' que manda usuarios.jsx
+    const { meta_id } = req.body; 
+
+    try {
+        const [resultado] = await db.query(
+            'UPDATE Usuarios SET meta_id = ? WHERE id = ?',
+            [meta_id, usuarioId]
+        );
+
+        if (resultado.affectedRows === 0) {
+            return res.status(404).json({ error: 'Usuario no encontrado.' });
+        }
+
+        res.json({ mensaje: 'Meta actualizada correctamente.' });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al actualizar la meta en la base de datos.' });
     }
 });
 

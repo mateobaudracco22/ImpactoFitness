@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../estilos/login.css";
 
@@ -6,12 +6,34 @@ function CrearCuenta() {
   const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
   const [telefono, setTelefono] = useState("");
-  const [objetivo, setObjetivo] = useState("musculacion/fuerza");
+  const [metaId, setMetaId] = useState(1);
+  const [metas, setMetas] = useState([]);
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [cargando, setCargando] = useState(false);
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Cargar metas al montar el componente
+    fetch("http://localhost:3000/api/metas")
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          setMetas(data);
+          setMetaId(data[0].id);
+        }
+      })
+      .catch(() => {
+        // Fallback si la API aún no tiene el endpoint
+        setMetas([
+          { id: 1, nombre: "Ganar Músculo", icono: "🏋️" },
+          { id: 2, nombre: "Perder Peso", icono: "🔥" },
+          { id: 3, nombre: "Resistencia / Cardio", icono: "🏃‍♂️" },
+          { id: 4, nombre: "Mantenimiento", icono: "🧘" }
+        ]);
+      });
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,9 +50,9 @@ function CrearCuenta() {
           nombre_completo: nombre,
           email,
           telefono,
-          objetivo,
+          meta_id: metaId,
           password,
-          rol: "cliente", // Todo usuario registrado desde la web inicia como cliente
+          rol: "cliente",
         }),
       });
 
@@ -91,15 +113,17 @@ function CrearCuenta() {
           </div>
 
           <div className="campo">
-            <label>Objetivo</label>
+            <label>Meta de Entrenamiento</label>
             <select 
-              value={objetivo} 
-              onChange={(e) => setObjetivo(e.target.value)}
+              value={metaId} 
+              onChange={(e) => setMetaId(Number(e.target.value))}
               className="campo-input"
             >
-              <option value="musculacion/fuerza">Musculación / Fuerza</option>
-              <option value="cardio/perdida_peso">Cardio / Pérdida de Peso</option>
-              <option value="clases/funcional">Clases / Funcional</option>
+              {metas.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.icono || "🎯"} {m.nombre}
+                </option>
+              ))}
             </select>
           </div>
 
