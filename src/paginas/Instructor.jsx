@@ -172,7 +172,6 @@ function Instructor() {
 
   return (
     <div className="instructor-container">
-      {/* BOTÓN FLOTANTE Y DRAWER PENDIENTES */}
       <button type="button" className="btn-flotante-izquierda" onClick={() => setMenuLateralAbierto(true)}>
         📌 <span className="badge-contador">{alumnosLibres.length}</span>
       </button>
@@ -188,7 +187,21 @@ function Instructor() {
               {alumnosLibres.map((al) => (
                 <div key={al.id || al.usuario_id} className="alumno-card-mini">
                   <h4>{al.nombre_completo}</h4>
-                  <p><strong>Meta:</strong> {al.meta_icono || "🎯"} {al.meta_nombre || "General"}</p>
+                  <div style={{ 
+                    display: "inline-flex", 
+                    alignItems: "center", 
+                    gap: "6px", 
+                    backgroundColor: "#2a2a36", 
+                    padding: "4px 10px", 
+                    borderRadius: "15px", 
+                    fontSize: "0.8rem", 
+                    color: "#b0b0c0", 
+                    margin: "5px 0", 
+                    border: "1px solid #3f3f4e" 
+                  }}>
+                    <span>{al.meta_icono || "🎯"}</span>
+                    <span style={{ color: "#fff", fontWeight: "500" }}>{al.meta_nombre || "General"}</span>
+                  </div>
                   <button className="btn-ver-rutina" onClick={() => tomarAlumno(al.id || al.usuario_id)}>
                     🤝 Tomar Alumno
                   </button>
@@ -216,27 +229,36 @@ function Instructor() {
             {misAlumnos.map((alumno) => {
               const idAlumno = alumno.usuario_id || alumno.id;
               return (
-                <div className="alumno-info">
+                <div key={idAlumno} className="alumno-card">
+                  <div>
                     <h3 className="alumno-nombre">{alumno.nombre_completo}</h3>
                     
-                    {/* Tarjeta de Meta */}
                     <div style={{ 
-                    display: "inline-flex", 
-                    alignItems: "center", 
-                    gap: "6px", 
-                    backgroundColor: "#2a2a36", 
-                    padding: "4px 10px", 
-                    borderRadius: "15px", 
-                    fontSize: "0.8rem", 
-                    color: "#b0b0c0", 
-                    margin: "5px 0", 
-                    border: "1px solid #3f3f4e" 
-                  }}>
-                    <span>{al.meta_icono || "🎯"}</span>
-                    <span style={{ color: "#fff", fontWeight: "500" }}>{al.meta_nombre || "General"}</span>
+                      display: "inline-flex", 
+                      alignItems: "center", 
+                      gap: "6px", 
+                      backgroundColor: "#2a2a36", 
+                      padding: "4px 10px", 
+                      borderRadius: "15px", 
+                      fontSize: "0.8rem", 
+                      color: "#b0b0c0", 
+                      margin: "5px 0 0 0", 
+                      border: "1px solid #3f3f4e" 
+                    }}>
+                      <span>{alumno.meta_icono || "🎯"}</span>
+                      <span style={{ color: "#fff", fontWeight: "500" }}>{alumno.meta_nombre || "General"}</span>
+                    </div>
                   </div>
 
+                  <div className="contenedor-botones-card">
+                    <button className="btn-ver-rutina" onClick={() => setSolicitudSeleccionada(alumno)}>
+                      ➕ Armar Rutina
+                    </button>
+                    <button className="btn-secundario" onClick={() => consultarRutinaAlumno(idAlumno, alumno.nombre_completo)}>
+                      📋 Ver Rutinas
+                    </button>
                   </div>
+                </div>
               );
             })}
           </div>
@@ -259,7 +281,7 @@ function Instructor() {
                     <div className="campo-grupo">
                       <label className="etiqueta-input">Día Asignado</label>
                       <select className="select-estilizado" value={diaAsignado} onChange={(e) => setDiaAsignado(e.target.value)}>
-                        {["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado"].map(d => (
+                        {["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo"].map(d => (
                           <option key={d} value={d}>{d}</option>
                         ))}
                       </select>
@@ -310,7 +332,7 @@ function Instructor() {
             <div className="modal-overlay-ejercicios" onClick={() => setModalEjerciciosAbierto(false)}>
               <div className="modal-contenido-ejercicios" onClick={(e) => e.stopPropagation()}>
                 <div className="encabezado-modal">
-                  <h3>🏋️ Catálogo de Ejercicios por Músculo</h3>
+                  <h3>🏋️️ Catálogo de Ejercicios por Músculo</h3>
                   <button className="btn-cerrar-modal" onClick={() => setModalEjerciciosAbierto(false)}>✖</button>
                 </div>
                 <div className="contenedor-burbujas-filtro">
@@ -369,9 +391,36 @@ function Instructor() {
                               {rut.dia_asignado || "Sin día"}: {rut.nombre_rutina || "Rutina sin nombre"}
                             </h4>
                             {(rut.rutina_id || rut.id) && (
-                              <button className="btn-borrar-rutina" onClick={() => borrarRutina(rut.rutina_id || rut.id)}>
-                                🗑️ Borrar
-                              </button>
+                              <div style={{ display: "flex", gap: "10px" }}>
+                                <button 
+                                  className="btn-ver-rutina"
+                                  style={{ padding: "4px 10px", margin: "0", fontSize: "0.85rem" }}
+                                  onClick={() => {
+                                    setEsEdicion(true);
+                                    setIdRutinaAEditar(rut.rutina_id || rut.id);
+                                    setNombreRutina(rut.nombre_rutina);
+                                    setDiaAsignado(rut.dia_asignado);
+                                    setEjerciciosSeleccionados(
+                                      (rut.ejercicios || []).map(ej => ({
+                                        ejercicio_id: ej.id || ej.ejercicio_id,
+                                        series: ej.series || 4,
+                                        repeticiones: ej.repeticiones || "10-12"
+                                      }))
+                                    );
+                                    setSolicitudSeleccionada({ 
+                                      id: verRutinaModal.usuarioId, 
+                                      usuario_id: verRutinaModal.usuarioId,
+                                      nombre_completo: verRutinaModal.nombreAlumno 
+                                    });
+                                    setVerRutinaModal(null);
+                                  }}
+                                >
+                                  ✏️ Editar
+                                </button>
+                                <button className="btn-borrar-rutina" onClick={() => borrarRutina(rut.rutina_id || rut.id)}>
+                                  🗑️ Borrar
+                                </button>
+                              </div>
                             )}
                           </div>
 
