@@ -399,25 +399,26 @@ app.delete('/api/rutinas/:id', async (req, res) => {
     }
 });
 
-// Obtener las opciones de metas (NUEVO)
-app.get('/api/metas', (req, res) => {
-    res.json([
-        { id: 'musculacion/fuerza', nombre: 'Ganar Músculo' },
-        { id: 'cardio/perdida_peso', nombre: 'Perder Peso' },
-        { id: 'clases/funcional', nombre: 'Resistencia / Cardio' }
-    ]);
+// Obtener las opciones de metas
+app.get('/api/metas', async (req, res) => {
+    try {
+        const [metas] = await db.query('SELECT * FROM metas');
+        res.json(metas);
+    } catch (error) {
+        res.status(500).json({ error: 'Error al obtener las metas de la base de datos.' });
+    }
 });
 
-// Actualizar la meta de un usuario (NUEVO)
+// Actualizar la meta de un usuario
 app.put('/api/usuarios/:id/meta', async (req, res) => {
     const usuarioId = req.params.id;
-    // Asegúrate de que tu frontend manda la propiedad 'objetivo' en el body
-    const { objetivo } = req.body; 
+    // Recibimos el 'meta_id' que manda usuarios.jsx
+    const { meta_id } = req.body; 
 
     try {
         const [resultado] = await db.query(
-            'UPDATE Usuarios SET objetivo = ? WHERE id = ?',
-            [objetivo, usuarioId]
+            'UPDATE Usuarios SET meta_id = ? WHERE id = ?',
+            [meta_id, usuarioId]
         );
 
         if (resultado.affectedRows === 0) {
