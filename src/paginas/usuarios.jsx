@@ -153,7 +153,6 @@ function MisRutinas() {
           >
             🎯 Mis Metas / Ajustes
           </button>
-          {/* NUEVO BOTÓN PARA IR A INFORMACIÓN */}
           <button 
             className="menu-item"
             onClick={() => navigate("/informacion")}
@@ -223,7 +222,6 @@ function MisRutinas() {
             </div>
           </>
         ) : (
-          /* SECCIÓN DE METAS / AJUSTES */
           <section className="seccion-metas-ajustes">
             <header className="cabecera-seccion">
               <h1>Selecciona tu Meta de Entrenamiento</h1>
