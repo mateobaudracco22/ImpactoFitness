@@ -75,7 +75,7 @@
      font-size: 17px;
   padding: 1em 2.7em;
   font-weight: 500;
-  background:  #c77903;
+  background:  #ee9003;
   color: white;
   border: none;
   position: relative;
@@ -107,7 +107,7 @@
 .transition {
   transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
   transition-duration: 500ms;
-  background-color: #ff5722;
+  background-color:#fc7405; 
   border-radius: 9999px;
   width: 0;
   height: 0;
