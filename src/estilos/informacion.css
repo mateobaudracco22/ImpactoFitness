@@ -72,9 +72,60 @@
 }
 
 .btn-login {
-    background-color: #ff5722;
-    color: #ffffff;
+     font-size: 17px;
+  padding: 1em 2.7em;
+  font-weight: 500;
+  background:  #c77903;
+  color: white;
+  border: none;
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.6em;
+  cursor: pointer;
 }
+
+.gradient {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  border-radius: 0.6em;
+  margin-top: -0.25em;
+  background-image: linear-gradient(
+    rgba(0, 0, 0, 0),
+    rgba(0, 0, 0, 0),
+    rgba(0, 0, 0, 0.3)
+  );
+}
+
+.label {
+  position: relative;
+  top: -1px;
+}
+
+.transition {
+  transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  transition-duration: 500ms;
+  background-color: #ff5722;
+  border-radius: 9999px;
+  width: 0;
+  height: 0;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+button:hover .transition {
+  width: 14em;
+  height: 14em;
+}
+
+button:active {
+  transform: scale(0.97);
+}
+
 
 .btn-login:hover {
     background-color: #ffb74d;
@@ -91,16 +142,22 @@
     gap: 25px;
 }
 
+
 .info .caja {
+    background-color: rgb(41, 39, 35);
+    transition: background-color 0.3 ease, border-color 0.3s ease, transform 0.3s ease;
     width: 300px;
     height: 400px;
-    background-color: #2a2a2a;
     padding: 25px;
     border: 2px solid #3a3a3a;
     border-radius: 15px;
     box-shadow: 0 0 10px rgba(255, 87, 34, 0.15);
     transition: 0.3s;
     overflow-y: auto;
+}
+.card:hover {
+  background-color: #8a3b14; /* Color cuando pasas el mouse (ejemplo: naranja) */
+  border-color: #aa4d13;
 }
 
 .info .caja:hover {
