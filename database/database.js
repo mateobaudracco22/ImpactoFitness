@@ -26,7 +26,17 @@ async function inicializarBaseDeDatos() {
         await conexion.query(`CREATE DATABASE IF NOT EXISTS impacto_fitness;`);
         await conexion.query(`USE impacto_fitness;`);
 
-        // 2. Crear tablas principales
+        // 2. Crear tabla de metas
+        await conexion.query(`
+            CREATE TABLE IF NOT EXISTS metas (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                nombre VARCHAR(255) NOT NULL,
+                descripcion TEXT,
+                icono VARCHAR(50)
+            );
+        `);
+
+        // 3. Crear tablas principales
         await conexion.query(`
             CREATE TABLE IF NOT EXISTS Usuarios (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -36,10 +46,18 @@ async function inicializarBaseDeDatos() {
                 objetivo ENUM('musculacion/fuerza', 'cardio/perdida_peso', 'clases/funcional'),
                 rol ENUM('cliente', 'instructor', 'admin') DEFAULT 'cliente',
                 password_hash VARCHAR(255) NOT NULL,
+                meta_id INT NULL,
                 instructor_id INT NULL,
                 FOREIGN KEY (instructor_id) REFERENCES Usuarios(id) ON DELETE SET NULL
             );
         `);
+
+        // Seguridad por si la tabla Usuarios ya existía sin meta_id
+        try {
+            await conexion.query(`ALTER TABLE Usuarios ADD COLUMN meta_id INT NULL;`);
+        } catch (e) {
+            // Si la columna ya existe, MySQL arrojará error
+        }
 
         await conexion.query(`
             CREATE TABLE IF NOT EXISTS Ejercicios (
@@ -93,28 +111,41 @@ async function inicializarBaseDeDatos() {
             );
         `);
 
-        // 3. Insertar Profesor de prueba si no existe
+        // 4. Insertar Metas por defecto si está vacía
+        const [metasCheck] = await conexion.query("SELECT COUNT(*) as total FROM metas");
+        if (metasCheck[0].total === 0) {
+            await conexion.query(`
+                INSERT INTO metas (id, nombre, descripcion, icono) VALUES
+                (1, 'Ganar Músculo', 'Enfocado en hipertrofia y fuerza.', '🏋️'),
+                (2, 'Perder Peso', 'Enfocado en déficit calórico y quema de grasa.', '🔥'),
+                (3, 'Resistencia / Cardio', 'Mejora del estado físico general.', '🏃‍♂️'),
+                (4, 'Mantenimiento', 'Mantener el peso actual y tono muscular.', '🧘');
+            `);
+            console.log('🎯 Metas de prueba insertadas.');
+        }
+
+        // 5. Insertar Profesor de prueba si no existe
         const [instructores] = await conexion.query("SELECT * FROM Usuarios WHERE rol = 'instructor'");
         if (instructores.length === 0) {
             await conexion.query(`
-                INSERT INTO Usuarios (nombre_completo, email, telefono, objetivo, rol, password_hash)
-                VALUES ('Profesor Nahuel', 'nahuel@gym.com', '1122334455', 'musculacion/fuerza', 'instructor', '123456')
+                INSERT INTO Usuarios (nombre_completo, email, telefono, rol, password_hash, meta_id)
+                VALUES ('Profesor Nahuel', 'nahuel@gym.com', '1122334455', 'instructor', '123456', NULL)
             `);
             console.log('👤 Instructor de prueba creado (nahuel@gym.com / 123456)');
         }
 
-        // 4. Insertar Alumnos de prueba si no existen
+        // 6. Insertar Alumnos de prueba si no existen
         const [alumnos] = await conexion.query("SELECT * FROM Usuarios WHERE rol = 'cliente'");
         if (alumnos.length === 0) {
             await conexion.query(`
-                INSERT INTO Usuarios (nombre_completo, email, telefono, objetivo, rol, password_hash) VALUES
-                ('Juan Pérez', 'juan@gmail.com', '1199887766', 'musculacion/fuerza', 'cliente', '123456'),
-                ('María Gómez', 'maria@gmail.com', '1144556677', 'cardio/perdida_peso', 'cliente', '123456');
+                INSERT INTO Usuarios (nombre_completo, email, telefono, rol, password_hash, meta_id) VALUES
+                ('Juan Pérez', 'juan@gmail.com', '1199887766', 'cliente', '123456', 1),
+                ('María Gómez', 'maria@gmail.com', '1144556677', 'cliente', '123456', 2);
             `);
             console.log('👥 Alumnos de prueba creados (Juan Pérez y María Gómez).');
         }
 
-        // 5. Insertar catálogo de Ejercicios y Etiquetas de prueba si está vacío
+        // 7. Insertar catálogo de Ejercicios y Etiquetas de prueba si está vacío
         const [ejercicios] = await conexion.query("SELECT COUNT(*) as total FROM Ejercicios");
         if (ejercicios[0].total === 0) {
             await conexion.query(`
@@ -157,12 +188,11 @@ async function inicializarBaseDeDatos() {
 
 // --- ENDPOINTS (API) ---
 
-// Estado del Servidor
 app.get('/api/estado', (req, res) => {
     res.json({ mensaje: 'El servidor de Impacto Fitness está activo' });
 });
 
-// Autenticación (Login)
+// Autenticación (Login) con LEFT JOIN a metas (soporta instructores sin meta)
 app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
     try {
@@ -184,7 +214,6 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-// Obtener alumnos clientes sin instructor asignado (filtra exclusivamente por instructor_id NULL o 0)
 app.get('/api/solicitudes', async (req, res) => {
     try {
         const [solicitudes] = await db.query(`
@@ -207,7 +236,6 @@ app.get('/api/solicitudes', async (req, res) => {
     }
 });
 
-// Asignar un alumno a un instructor (al asignarlo, su instructor_id deja de ser NULL y sale de la lista)
 app.put('/api/alumnos/:id/asignar', async (req, res) => {
     const alumnoId = req.params.id;
     const { instructor_id } = req.body;
@@ -228,7 +256,6 @@ app.put('/api/alumnos/:id/asignar', async (req, res) => {
     }
 });
 
-// Obtener catálogo de ejercicios con sus etiquetas musculares
 app.get('/api/ejercicios', async (req, res) => {
     try {
         const consulta = `
@@ -257,7 +284,6 @@ app.get('/api/ejercicios', async (req, res) => {
     }
 });
 
-// Endpoint de Registro para nuevos usuarios
 app.post('/api/registro', async (req, res) => {
     const { nombre_completo, email, telefono, meta_id, password, rol } = req.body;
     try {
@@ -273,7 +299,6 @@ app.post('/api/registro', async (req, res) => {
     }
 });
 
-// Obtener rutinas de un alumno
 app.get('/api/rutinas/usuario/:usuario_id', async (req, res) => {
     const { usuario_id } = req.params;
     try {
@@ -323,7 +348,6 @@ app.get('/api/rutinas/usuario/:usuario_id', async (req, res) => {
     }
 });
 
-// Crear una nueva rutina
 app.post('/api/rutinas', async (req, res) => {
     const { usuario_id, instructor_id, nombre_rutina, proposito, dia_asignado, ejercicios } = req.body;
     try {
@@ -349,7 +373,6 @@ app.post('/api/rutinas', async (req, res) => {
     }
 });
 
-// Editar una rutina
 app.put('/api/rutinas/:id', async (req, res) => {
     const { id } = req.params;
     const { nombre_rutina, dia_asignado, ejercicios } = req.body;
@@ -378,7 +401,6 @@ app.put('/api/rutinas/:id', async (req, res) => {
     }
 });
 
-// Eliminar una rutina
 app.delete('/api/rutinas/:id', async (req, res) => {
     const { id } = req.params;
 
@@ -396,7 +418,6 @@ app.delete('/api/rutinas/:id', async (req, res) => {
     }
 });
 
-// Obtener las opciones de metas
 app.get('/api/metas', async (req, res) => {
     try {
         const [metas] = await db.query('SELECT * FROM metas');
@@ -406,7 +427,6 @@ app.get('/api/metas', async (req, res) => {
     }
 });
 
-// Actualizar la meta de un usuario
 app.put('/api/usuarios/:id/meta', async (req, res) => {
     const usuarioId = req.params.id;
     const { meta_id } = req.body; 
@@ -427,7 +447,6 @@ app.put('/api/usuarios/:id/meta', async (req, res) => {
     }
 });
 
-// Obtener los alumnos asignados a un instructor específico
 app.get('/api/instructores/:instructor_id/alumnos', async (req, res) => {
     const { instructor_id } = req.params;
     try {
