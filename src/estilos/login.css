@@ -1,17 +1,18 @@
 * {
     box-sizing: border-box;
+    
 }
 
 .contenedor-login {
+    background: linear-gradient(to right,#121212,#ff5722);
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background-color: #121212;
 }
 
 .tarjeta-login {
-    background-color: #2A2A2A;
+    background-color: #1d1a15;
     padding: 2.5rem;
     border-radius: 12px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
