@@ -1,12 +1,15 @@
-/* Variables de color*/
+/* Variables de color de la paleta */
 :root {
   --bg-app: #121212;
   --bg-sidebar: #1a1a1a;
   --bg-card: #242424;
+  --bg-secundario: #2a2a2a;
   --text-primary: #ffffff;
-  --text-secondary: #aaaaaa;
+  --text-secondary: #b0b0b0;
   --accent-orange: #ff5722;
-  --border-color: #333333;
+  --tono-medio: #ff9800;
+  --detalle-brillo: #ffb74d;
+  --border-color: #3a3a3a;
 }
 
 /* Layout General */
@@ -38,7 +41,8 @@
 .avatar-circulo {
   width: 80px;
   height: 80px;
-  background-color: #444;
+  background-color: var(--bg-secundario);
+  border: 2px solid var(--accent-orange);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -50,6 +54,19 @@
 .perfil-info h3 {
   margin: 0;
   font-size: 18px;
+  font-weight: 500;
+}
+
+/* Insignia / Badge de Meta en la Sidebar (Tonos naranjas) */
+.badge-meta-sidebar {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 11px;
+  background-color: rgba(255, 152, 0, 0.15);
+  color: var(--detalle-brillo);
+  border: 1px solid rgba(255, 152, 0, 0.4);
+  padding: 4px 10px;
+  border-radius: 12px;
   font-weight: 500;
 }
 
@@ -75,7 +92,7 @@
 
 .menu-item:hover {
   color: var(--text-primary);
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: rgba(255, 87, 34, 0.1);
 }
 
 .menu-item.activo {
@@ -112,7 +129,7 @@
 }
 
 .titulo-dia {
-  color: var(--accent-orange);
+  color: var(--tono-medio);
   font-size: 20px;
   border: 1px solid var(--accent-orange);
   border-radius: 8px;
@@ -120,7 +137,7 @@
   display: inline-block;
   margin-bottom: 20px;
   font-weight: 600;
-  background-color: rgba(255, 87, 34, 0.05);
+  background-color: rgba(255, 87, 34, 0.1);
 }
 
 /* Tarjetas de Rutina */
@@ -135,6 +152,12 @@
   border-radius: 12px;
   padding: 20px;
   border: 1px solid var(--border-color);
+  transition: 0.3s;
+}
+
+.tarjeta-rutina:hover {
+  border-color: var(--detalle-brillo);
+  box-shadow: 0 0 15px rgba(255, 152, 0, 0.2);
 }
 
 .tarjeta-cabecera {
@@ -159,8 +182,8 @@
 
 .btn-ver-detalle {
   background: transparent;
-  color: var(--text-secondary);
-  border: 1px solid var(--text-secondary);
+  color: var(--detalle-brillo);
+  border: 1px solid var(--detalle-brillo);
   padding: 6px 12px;
   border-radius: 6px;
   cursor: pointer;
@@ -168,8 +191,8 @@
 }
 
 .btn-ver-detalle:hover {
-  border-color: var(--accent-orange);
-  color: var(--accent-orange);
+  background-color: var(--detalle-brillo);
+  color: var(--bg-app);
 }
 
 /* Lista de ejercicios */
@@ -208,7 +231,6 @@
   justify-content: center;
   align-items: center;
   z-index: 1000;
-  animation: fadeIn 0.2s ease-in-out;
 }
 
 .modal-content-usuario {
@@ -221,7 +243,6 @@
   max-height: 85vh;
   overflow-y: auto;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
-  animation: slideUp 0.3s ease-out;
 }
 
 .modal-header-usuario {
@@ -235,7 +256,7 @@
 
 .modal-header-usuario h2 {
   margin: 0;
-  color: var(--accent-orange);
+  color: var(--tono-medio);
   font-size: 24px;
 }
 
@@ -274,8 +295,8 @@
 }
 
 .ejercicio-numero {
-  background-color: rgba(255, 87, 34, 0.1);
-  color: var(--accent-orange);
+  background-color: rgba(255, 87, 34, 0.15);
+  color: var(--detalle-brillo);
   width: 35px;
   height: 35px;
   display: flex;
@@ -299,111 +320,7 @@
   font-size: 14px;
 }
 
-/* Animaciones suaves para el modal */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideUp {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
-/* --- BURBUJAS MUSCULARES Y CATÁLOGO (instructor.css) --- */
-.modal-ancho {
-  max-width: 850px !important;
-}
-
-.grid-dos-columnas {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 15px;
-}
-
-.contenedor-burbujas-filtro {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.burbuja-filtro {
-  background-color: var(--bg-terciario, #2a2a3c);
-  border: 1px solid var(--borde-tarjeta, #3f3f5a);
-  color: #ccc;
-  border-radius: 20px;
-  padding: 5px 14px;
-  font-size: 12px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.burbuja-filtro.activa, .burbuja-filtro:hover {
-  background-color: #6c5ce7;
-  color: #fff;
-  border-color: #6c5ce7;
-}
-
-.grid-ejercicios-catalogo {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 10px;
-  max-height: 200px;
-  overflow-y: auto;
-  padding-right: 5px;
-}
-
-.tarjeta-ejercicio-item {
-  background-color: var(--bg-terciario, #1f1f2e);
-  border: 1px solid var(--borde-tarjeta, #33334d);
-  border-radius: 8px;
-  padding: 8px 12px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-  transition: transform 0.15s, border-color 0.15s;
-}
-
-.tarjeta-ejercicio-item:hover:not(.agregado) {
-  border-color: #6c5ce7;
-  transform: translateY(-2px);
-}
-
-.tarjeta-ejercicio-item.agregado {
-  opacity: 0.5;
-  cursor: default;
-}
-
-.burbujas-musculares {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  margin-top: 4px;
-}
-
-.badge-musculo {
-  background-color: rgba(108, 92, 231, 0.2);
-  color: #a29bfe;
-  border: 1px solid rgba(108, 92, 231, 0.4);
-  font-size: 10px;
-  padding: 2px 6px;
-  border-radius: 10px;
-}
-
-.badge-musculo.mini {
-  font-size: 9px;
-  padding: 1px 4px;
-}
-
-.meta-badge-modal {
-  font-size: 13px;
-  color: #a29bfe;
-  margin-top: 4px;
-}
-
-/* --- TARJETAS DE METAS (usuario.css) --- */
+/* --- TARJETAS DE METAS --- */
 .grid-metas-tarjetas {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -412,8 +329,8 @@
 }
 
 .tarjeta-meta-opcion {
-  background-color: var(--bg-secundario, #1e1e2d);
-  border: 2px solid transparent;
+  background-color: var(--bg-secundario);
+  border: 2px solid var(--border-color);
   border-radius: 12px;
   padding: 16px;
   display: flex;
@@ -425,13 +342,13 @@
 }
 
 .tarjeta-meta-opcion:hover {
-  border-color: #6c5ce7;
+  border-color: var(--detalle-brillo);
   transform: translateY(-2px);
 }
 
 .tarjeta-meta-opcion.meta-activa {
-  border-color: #00b894;
-  background-color: rgba(0, 184, 148, 0.1);
+  border-color: var(--accent-orange);
+  background-color: rgba(255, 87, 34, 0.1);
 }
 
 .icono-meta {
@@ -443,18 +360,9 @@
   top: 10px;
   right: 10px;
   font-size: 11px;
-  background-color: #00b894;
+  background-color: var(--accent-orange);
   color: white;
   padding: 2px 8px;
   border-radius: 10px;
-}
-
-.badge-meta-sidebar {
-  display: inline-block;
-  margin-top: 6px;
-  font-size: 11px;
-  background-color: rgba(108, 92, 231, 0.2);
-  color: #a29bfe;
-  padding: 3px 8px;
-  border-radius: 12px;
+  font-weight: bold;
 }

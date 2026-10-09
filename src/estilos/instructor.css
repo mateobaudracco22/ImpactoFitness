@@ -8,7 +8,6 @@
   --texto-blanco: #ffffff;
   --texto-gris: #b0b0b0;
   --borde-tarjeta: #3a3a3a;
-  --purple-accent: #6c5ce7;
 }
 
 /* Base */
@@ -33,9 +32,15 @@
   border-left: 6px solid var(--acento-principal);
   padding: 25px;
   border-radius: 8px;
-  text-align: center;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
   margin-bottom: 35px;
+}
+
+.header-instructor-personalizado {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-align: left;
 }
 
 .header-title { color: var(--detalle-brillo); margin: 0 0 8px; font-size: 28px; }
@@ -62,6 +67,7 @@
 
 /* Listas & Tarjetas Alumnos */
 .alumnos-list { display: flex; flex-direction: column; gap: 15px; }
+.contenedor-alumnos-mini { margin-top: 15px; }
 
 .alumno-card {
   background-color: var(--bg-secundario);
@@ -75,8 +81,26 @@
 }
 
 .alumno-nombre { margin: 0; font-size: 18px; color: var(--texto-blanco); }
-.alumno-rutina { margin: 4px 0 0; font-size: 14px; color: var(--texto-gris); }
 .contenedor-botones-card { display: flex; gap: 10px; }
+
+/* Insignia / Badge de Meta del Alumno (Tonos naranjas limpios) */
+.badge-meta-alumno {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: rgba(255, 152, 0, 0.15);
+  padding: 4px 10px;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  color: var(--detalle-brillo);
+  margin: 5px 0 0 0;
+  border: 1px solid rgba(255, 152, 0, 0.4);
+}
+
+.texto-meta-alumno {
+  color: #fff;
+  font-weight: 500;
+}
 
 /* Botones */
 .btn-ver-rutina, .btn-secundario, .btn-borrar-rutina, .btn-cancelar {
@@ -109,6 +133,7 @@
 
 .formulario-rutina { display: flex; flex-direction: column; gap: 18px; }
 .campo-grupo { display: flex; flex-direction: column; gap: 6px; }
+.margen-superior-catalogo { margin-top: 10px; }
 .etiqueta-input { color: var(--detalle-brillo); font-size: 0.9rem; font-weight: 600; }
 
 .input-estilizado, .select-estilizado {
@@ -213,39 +238,50 @@
   gap: 10px;
 }
 
-/* Catálogo y Burbujas */
+/* Catálogo y Burbujas (Tonos anaranjados forzados) */
 .grid-dos-columnas { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
 .contenedor-burbujas-filtro { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
 
 .burbuja-filtro {
   background-color: var(--bg-terciario);
   border: 1px solid var(--borde-tarjeta);
-  color: #ccc;
+  color: var(--texto-gris);
   border-radius: 20px;
   padding: 5px 14px;
   font-size: 12px;
   cursor: pointer;
+  transition: 0.2s ease;
 }
 
-.burbuja-filtro.activa, .burbuja-filtro:hover { background-color: var(--purple-accent); color: #fff; }
+.burbuja-filtro.activa, .burbuja-filtro:hover { 
+  background-color: var(--acento-principal) !important; 
+  color: #ffffff !important; 
+  border-color: var(--tono-medio) !important; 
+}
 
 .btn-abrir-catalogo-modal {
   width: 100%;
   padding: 12px;
-  background-color: #2a2a3c;
-  color: #a29bfe;
-  border: 2px dashed var(--purple-accent);
+  background-color: var(--bg-terciario);
+  color: var(--detalle-brillo);
+  border: 2px dashed var(--acento-principal);
   border-radius: 8px;
   font-weight: bold;
   cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.btn-abrir-catalogo-modal:hover {
+  background-color: rgba(255, 87, 34, 0.1);
+  border-color: var(--tono-medio);
 }
 
 .modal-contenido-ejercicios {
-  background: #1e1e2d;
+  background: var(--bg-secundario);
   width: 90%;
   max-width: 800px;
   padding: 20px;
-  border: 1px solid #3f3f5a;
+  border: 1px solid var(--borde-tarjeta);
 }
 
 .grid-ejercicios-catalogo-modal {
@@ -257,25 +293,29 @@
 }
 
 .tarjeta-ejercicio-burbuja {
-  background: #28283d;
-  border: 1px solid #3f3f5a;
+  background: var(--bg-terciario);
+  border: 1px solid var(--borde-tarjeta);
   border-radius: 10px;
   padding: 12px;
   cursor: pointer;
+  transition: 0.2s ease;
 }
 
-.tarjeta-ejercicio-burbuja:hover:not(.agregado) { border-color: var(--purple-accent); transform: translateY(-3px); }
+.tarjeta-ejercicio-burbuja:hover:not(.agregado) { 
+  border-color: var(--tono-medio); 
+  transform: translateY(-3px); 
+}
 .tarjeta-ejercicio-burbuja.agregado { opacity: 0.5; cursor: default; border-color: #00b894; }
 
-.cabecera-tarjeta-ejercicio { display: flex; justify-content: space-between; font-weight: bold; color: #fff; }
-.desc-ej-catalogo { font-size: 12px; color: #aaa; margin: 6px 0; }
+.cabecera-tarjeta-ejercicio { display: flex; justify-content: space-between; font-weight: bold; color: var(--texto-blanco); }
+.desc-ej-catalogo { font-size: 12px; color: var(--texto-gris); margin: 6px 0; }
 
 .burbujas-musculares { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
 
 .badge-musculo {
-  background-color: rgba(108, 92, 231, 0.2);
-  color: #a29bfe;
-  border: 1px solid rgba(108, 92, 231, 0.4);
+  background-color: rgba(255, 152, 0, 0.2) !important; 
+  color: var(--detalle-brillo) !important; 
+  border: 1px solid rgba(255, 152, 0, 0.5) !important;
   font-size: 11px;
   padding: 2px 8px;
   border-radius: 12px;
@@ -286,12 +326,18 @@
 /* Rutina agrupada modal */
 .vista-rutina-agrupada { display: flex; flex-direction: column; gap: 18px; margin-top: 15px; }
 .bloque-musculo-dia { background-color: var(--bg-terciario); padding: 15px; border-radius: 8px; }
-.titulo-bloque-dia { color: var(--tono-medio); margin: 0 0 12px; font-size: 1rem; }
+.encabezado-bloque-dia { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.titulo-bloque-dia { color: var(--tono-medio); margin: 0; font-size: 1rem; }
+.acciones-bloque-rutina { display: flex; gap: 10px; }
+.btn-editar-rutina-chico { padding: 4px 10px; margin: 0; font-size: 0.85rem; }
+
 .lista-ejercicios-vista { display: flex; flex-direction: column; gap: 10px; }
 .tarjeta-ejercicio-vista { display: flex; justify-content: space-between; align-items: center; background-color: var(--bg-principal); padding: 10px 14px; border-radius: 6px; }
 .ejercicio-nombre-vista { margin: 0; font-weight: 600; color: #fff; }
 .ejercicio-desc-vista { margin: 2px 0 0; font-size: 0.8rem; color: var(--texto-gris); }
 .badge-series-reps { background-color: rgba(255, 87, 34, 0.2); color: var(--detalle-brillo); padding: 4px 10px; border-radius: 12px; font-size: 0.85rem; font-weight: bold; }
+.texto-vacio { color: var(--texto-gris); text-align: center; }
+.texto-vacio-chico { font-size: 0.8rem; }
 
 /* Botón de Cerrar Sesión Estilizado */
 .btn-cerrar-sesion {
