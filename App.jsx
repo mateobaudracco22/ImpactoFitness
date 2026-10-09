@@ -2,7 +2,7 @@ import Login from "/src/paginas/login.jsx";
 import Informacion from "./src/paginas/informacion.jsx";
 import Instructor from "./src/paginas/instructor.jsx";
 import Usuarios from "./src/paginas/usuarios.jsx";
-import CrearCuenta from "./src/paginas/crear.cuenta.jsx"; // <-- Agregado
+import CrearCuenta from "./src/paginas/crear.cuenta.jsx";
 
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
@@ -10,7 +10,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Login />} />
+        <Route path="/" element={<Informacion />} />
         <Route path="/login" element={<Login />} />
         <Route path="/informacion" element={<Informacion />} />
         <Route path="/instructor" element={<Instructor />} />

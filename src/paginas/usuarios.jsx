@@ -36,7 +36,7 @@ function MisRutinas() {
       const respuesta = await fetch(`http://localhost:3000/api/rutinas/usuario/${idUsuario}`);
       if (!respuesta.ok) throw new Error("Error al obtener las rutinas");
       
-      const datos = await respuesta.json(); // La API devuelve un array agrupado por rutina
+      const datos = await respuesta.json();
       
       const agrupado = datos.reduce((acc, item) => {
         const dia = item.dia_asignado || "Sin asignar";
@@ -68,7 +68,6 @@ function MisRutinas() {
         const datos = await res.json();
         setMetasDisponibles(datos);
       } else {
-        // Metas predeterminadas en caso de fallback
         setMetasDisponibles([
           { id: 1, nombre: "Ganar Músculo", descripcion: "Enfocado en hipertrofia y fuerza.", icono: "🏋️" },
           { id: 2, nombre: "Perder Peso", descripcion: "Enfocado en déficit calórico y quema de grasa.", icono: "🔥" },
@@ -153,6 +152,13 @@ function MisRutinas() {
             onClick={() => setSeccionActiva("metas")}
           >
             🎯 Mis Metas / Ajustes
+          </button>
+          {/* NUEVO BOTÓN PARA IR A INFORMACIÓN */}
+          <button 
+            className="menu-item"
+            onClick={() => navigate("/informacion")}
+          >
+            ℹ️ Información del Gimnasio
           </button>
         </nav>
 
