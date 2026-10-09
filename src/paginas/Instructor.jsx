@@ -36,7 +36,7 @@ function Instructor() {
 
   const cerrarSesion = () => {
     localStorage.removeItem("usuario");
-    window.location.href = "/"; // Ajusta la ruta de redirección si usas React Router (ej. navigate("/login"))
+    window.location.href = "/";
   };
 
   const cargarDatos = async (instructorId) => {
@@ -190,24 +190,13 @@ function Instructor() {
               <h3>📌 Alumnos Sin Asignar ({alumnosLibres.length})</h3>
               <button className="btn-cerrar-modal" onClick={() => setMenuLateralAbierto(false)}>✖</button>
             </div>
-            <div className="alumnos-list" style={{ marginTop: "15px" }}>
+            <div className="alumnos-list contenedor-alumnos-mini">
               {alumnosLibres.map((al) => (
                 <div key={al.id || al.usuario_id} className="alumno-card-mini">
                   <h4>{al.nombre_completo}</h4>
-                  <div style={{ 
-                    display: "inline-flex", 
-                    alignItems: "center", 
-                    gap: "6px", 
-                    backgroundColor: "#2a2a36", 
-                    padding: "4px 10px", 
-                    borderRadius: "15px", 
-                    fontSize: "0.8rem", 
-                    color: "#b0b0c0", 
-                    margin: "5px 0", 
-                    border: "1px solid #3f3f4e" 
-                  }}>
+                  <div className="badge-meta-alumno">
                     <span>{al.meta_icono || "🎯"}</span>
-                    <span style={{ color: "#fff", fontWeight: "500" }}>{al.meta_nombre || "General"}</span>
+                    <span className="texto-meta-alumno">{al.meta_nombre || "General"}</span>
                   </div>
                   <button className="btn-ver-rutina" onClick={() => tomarAlumno(al.id || al.usuario_id)}>
                     🤝 Tomar Alumno
@@ -220,7 +209,7 @@ function Instructor() {
       )}
 
       <div className="instructor-content">
-        <header className="header-card" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", textAlign: "left" }}>
+        <header className="header-card header-instructor-personalizado">
           <div>
             <h1 className="header-title">Panel del Instructor</h1>
             <p className="header-subtitle">{instructor ? `Bienvenido/a, ${instructor.nombre_completo}` : ""}</p>
@@ -245,20 +234,9 @@ function Instructor() {
                   <div>
                     <h3 className="alumno-nombre">{alumno.nombre_completo}</h3>
                     
-                    <div style={{ 
-                      display: "inline-flex", 
-                      alignItems: "center", 
-                      gap: "6px", 
-                      backgroundColor: "#2a2a36", 
-                      padding: "4px 10px", 
-                      borderRadius: "15px", 
-                      fontSize: "0.8rem", 
-                      color: "#b0b0c0", 
-                      margin: "5px 0 0 0", 
-                      border: "1px solid #3f3f4e" 
-                    }}>
+                    <div className="badge-meta-alumno">
                       <span>{alumno.meta_icono || "🎯"}</span>
-                      <span style={{ color: "#fff", fontWeight: "500" }}>{alumno.meta_nombre || "General"}</span>
+                      <span className="texto-meta-alumno">{alumno.meta_nombre || "General"}</span>
                     </div>
                   </div>
 
@@ -300,7 +278,7 @@ function Instructor() {
                     </div>
                   </div>
 
-                  <div className="campo-grupo" style={{ marginTop: "10px" }}>
+                  <div className="campo-grupo margen-superior-catalogo">
                     <button type="button" className="btn-abrir-catalogo-modal" onClick={() => setModalEjerciciosAbierto(true)}>
                       🔍 Abrir Catálogo con Burbujas Musculares
                     </button>
@@ -398,15 +376,14 @@ function Instructor() {
 
                       return (
                         <div key={idDeRutina} className="bloque-musculo-dia">
-                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
+                          <div className="encabezado-bloque-dia">
                             <h4 className="titulo-bloque-dia">
                               {rut.dia_asignado || "Sin día"}: {rut.nombre_rutina || "Rutina sin nombre"}
                             </h4>
                             {(rut.rutina_id || rut.id) && (
-                              <div style={{ display: "flex", gap: "10px" }}>
+                              <div className="acciones-bloque-rutina">
                                 <button 
-                                  className="btn-ver-rutina"
-                                  style={{ padding: "4px 10px", margin: "0", fontSize: "0.85rem" }}
+                                  className="btn-ver-rutina btn-editar-rutina-chico"
                                   onClick={() => {
                                     setEsEdicion(true);
                                     setIdRutinaAEditar(rut.rutina_id || rut.id);
@@ -438,7 +415,7 @@ function Instructor() {
 
                           <div className="lista-ejercicios-vista">
                             {ejerciciosLista.length > 0 ? (
-                              ejerciciosLista.map((ej, idx) => (
+                              ejerciciosLista.main || ejerciciosLista.map((ej, idx) => (
                                 <div key={ej.id || idx} className="tarjeta-ejercicio-vista">
                                   <div>
                                     <p className="ejercicio-nombre-vista">{ej.nombre || ej.nombre_ejercicio || "Ejercicio"}</p>
@@ -450,7 +427,7 @@ function Instructor() {
                                 </div>
                               ))
                             ) : (
-                              <p className="texto-vacio" style={{ fontSize: "0.8rem" }}>Sin ejercicios asignados.</p>
+                              <p className="texto-vacio texto-vacio-chico">Sin ejercicios asignados.</p>
                             )}
                           </div>
                         </div>
