@@ -1,8 +1,10 @@
 * {
     box-sizing: border-box;
+   
 }
 
-.info { 
+.info {  background: linear-gradient(to right,#121212,#ff5722);
+    background-attachment:fixed;
     font-family: Arial, sans-serif;
     background-color: #121212;
     color: #ffffff;
