@@ -83,7 +83,7 @@ function Login({ onLoginExitoso }) {
                 className="boton-ojo"
                 onClick={() => setMostrarPassword(!mostrarPassword)}
               >
-                {mostrarPassword ? "🙈" : "👁️"}
+                {mostrarPassword ? "👁️" : "🙈"}
               </button>
             </div>
           </div>
