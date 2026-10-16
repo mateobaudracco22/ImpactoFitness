@@ -145,19 +145,19 @@ function MisRutinas() {
             className={`menu-item ${seccionActiva === "rutinas" ? "activo" : ""}`}
             onClick={() => setSeccionActiva("rutinas")}
           >
-            📋 Mis Rutinas
+             Mis Rutinas
           </button>
           <button 
             className={`menu-item ${seccionActiva === "metas" ? "activo" : ""}`}
             onClick={() => setSeccionActiva("metas")}
           >
-            🎯 Mis Metas / Ajustes
+             Mis Metas / Ajustes
           </button>
           <button 
             className="menu-item"
             onClick={() => navigate("/informacion")}
           >
-            ℹ️ Información del Gimnasio
+             Información del Gimnasio
           </button>
         </nav>
 
