@@ -1,6 +1,7 @@
 * {
     box-sizing: border-box;
-    width-min: 1100pxs;
+    width-min: 1100px;
+    
 }
 
 .info {  background: linear-gradient(to right,#121212,#ff5722);
