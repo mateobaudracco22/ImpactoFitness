@@ -17,7 +17,18 @@ function Instructor() {
   const [esEdicion, setEsEdicion] = useState(false);
   const [idRutinaAEditar, setIdRutinaAEditar] = useState(null);
   const [nombreRutina, setNombreRutina] = useState("");
-  const [diaAsignado, setDiaAsignado] = useState("Lunes");
+  
+  // Selección múltiple de días mediante Checkboxes
+  const [diasSeleccionados, setDiasSeleccionados] = useState({
+    Lunes: false,
+    Martes: false,
+    Miercoles: false,
+    Jueves: false,
+    Viernes: false,
+    Sabado: false,
+    Domingo: false,
+  });
+  
   const [ejerciciosSeleccionados, setEjerciciosSeleccionados] = useState([]);
 
   // Modal Ver Rutina del Alumno
@@ -123,12 +134,27 @@ function Instructor() {
     setEjerciciosSeleccionados(copia);
   };
 
+  const handleDiaChange = (dia) => {
+    setDiasSeleccionados({
+      ...diasSeleccionados,
+      [dia]: !diasSeleccionados[dia]
+    });
+  };
+
   const resetearFormulario = () => {
     setSolicitudSeleccionada(null);
     setEsEdicion(false);
     setIdRutinaAEditar(null);
     setNombreRutina("");
-    setDiaAsignado("Lunes");
+    setDiasSeleccionados({
+      Lunes: false,
+      Martes: false,
+      Miercoles: false,
+      Jueves: false,
+      Viernes: false,
+      Sabado: false,
+      Domingo: false,
+    });
     setEjerciciosSeleccionados([]);
     setEtiquetaFiltro("TODOS");
     setModalEjerciciosAbierto(false);
@@ -141,29 +167,46 @@ function Instructor() {
       return;
     }
 
-    const endpoint = esEdicion
-      ? `http://localhost:3000/api/rutinas/${idRutinaAEditar}`
-      : "http://localhost:3000/api/rutinas";
+    const diasActivos = Object.keys(diasSeleccionados).filter(dia => diasSeleccionados[dia]);
+    if (diasActivos.length === 0) {
+      alert("Selecciona al menos un día de la semana.");
+      return;
+    }
 
     try {
-      const res = await fetch(endpoint, {
-        method: esEdicion ? "PUT" : "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          usuario_id: solicitudSeleccionada.usuario_id || solicitudSeleccionada.id,
-          instructor_id: instructor?.id,
-          nombre_rutina: nombreRutina,
-          proposito: solicitudSeleccionada.meta_nombre || "Gimnasio General",
-          dia_asignado: diaAsignado,
-          ejercicios: ejerciciosSeleccionados
-        })
-      });
-
-      if (res.ok) {
-        alert("¡Rutina guardada!");
-        resetearFormulario();
-        cargarDatos(instructor.id);
+      if (esEdicion) {
+        await fetch(`http://localhost:3000/api/rutinas/${idRutinaAEditar}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            nombre_rutina: nombreRutina,
+            dia_asignado: diasActivos[0],
+            ejercicios: ejerciciosSeleccionados
+          })
+        });
+      } else {
+        // Asignar y duplicar la rutina para cada día tildado
+        await Promise.all(
+          diasActivos.map(dia =>
+            fetch("http://localhost:3000/api/rutinas", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                usuario_id: solicitudSeleccionada.usuario_id || solicitudSeleccionada.id,
+                instructor_id: instructor?.id,
+                nombre_rutina: nombreRutina,
+                proposito: solicitudSeleccionada.meta_nombre || "Gimnasio General",
+                dia_asignado: dia,
+                ejercicios: ejerciciosSeleccionados
+              })
+            })
+          )
+        );
       }
+
+      alert("¡Rutina(s) guardada(s) con éxito!");
+      resetearFormulario();
+      cargarDatos(instructor.id);
     } catch (err) {
       alert("Error al guardar la rutina.");
     }
@@ -268,13 +311,21 @@ function Instructor() {
                       <label className="etiqueta-input">Nombre de la Rutina</label>
                       <input type="text" className="input-estilizado" value={nombreRutina} onChange={(e) => setNombreRutina(e.target.value)} required />
                     </div>
+
                     <div className="campo-grupo">
-                      <label className="etiqueta-input">Día Asignado</label>
-                      <select className="select-estilizado" value={diaAsignado} onChange={(e) => setDiaAsignado(e.target.value)}>
-                        {["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo"].map(d => (
-                          <option key={d} value={d}>{d}</option>
+                      <label className="etiqueta-input">Días Asignados</label>
+                      <div className="contenedor-dias-checkbox">
+                        {["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo"].map((dia) => (
+                          <label key={dia} className="checkbox-dia-label">
+                            <input 
+                              type="checkbox" 
+                              checked={diasSeleccionados[dia] || false} 
+                              onChange={() => handleDiaChange(dia)} 
+                            />
+                            <span>{dia}</span>
+                          </label>
                         ))}
-                      </select>
+                      </div>
                     </div>
                   </div>
 
@@ -388,7 +439,15 @@ function Instructor() {
                                     setEsEdicion(true);
                                     setIdRutinaAEditar(rut.rutina_id || rut.id);
                                     setNombreRutina(rut.nombre_rutina);
-                                    setDiaAsignado(rut.dia_asignado);
+                                    setDiasSeleccionados({
+                                      Lunes: rut.dia_asignado === "Lunes",
+                                      Martes: rut.dia_asignado === "Martes",
+                                      Miercoles: rut.dia_asignado === "Miercoles",
+                                      Jueves: rut.dia_asignado === "Jueves",
+                                      Viernes: rut.dia_asignado === "Viernes",
+                                      Sabado: rut.dia_asignado === "Sabado",
+                                      Domingo: rut.dia_asignado === "Domingo",
+                                    });
                                     setEjerciciosSeleccionados(
                                       (rut.ejercicios || []).map(ej => ({
                                         ejercicio_id: ej.id || ej.ejercicio_id,
@@ -415,7 +474,7 @@ function Instructor() {
 
                           <div className="lista-ejercicios-vista">
                             {ejerciciosLista.length > 0 ? (
-                              ejerciciosLista.main || ejerciciosLista.map((ej, idx) => (
+                              ejerciciosLista.map((ej, idx) => (
                                 <div key={ej.id || idx} className="tarjeta-ejercicio-vista">
                                   <div>
                                     <p className="ejercicio-nombre-vista">{ej.nombre || ej.nombre_ejercicio || "Ejercicio"}</p>

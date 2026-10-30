@@ -358,3 +358,39 @@
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(255, 87, 34, 0.3);
 }
+
+/* Contenedor de checkboxes de los días */
+.contenedor-dias-checkbox {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  background-color: var(--bg-principal);
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--borde-tarjeta);
+}
+
+.checkbox-dia-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  color: var(--texto-blanco);
+  font-size: 0.85rem;
+  background-color: var(--bg-secundario);
+  padding: 5px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--borde-tarjeta);
+  transition: 0.2s ease;
+}
+
+.checkbox-dia-label:hover {
+  border-color: var(--tono-medio);
+}
+
+.checkbox-dia-label input[type="checkbox"] {
+  accent-color: var(--acento-principal);
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+}
