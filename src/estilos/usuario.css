@@ -366,3 +366,107 @@
   border-radius: 10px;
   font-weight: bold;
 }
+/* BOTÓN VER DETALLE */
+.btn-ver-detalle {
+  width: 100%;
+  margin-top: 20px;
+  padding: 13px;
+  background: linear-gradient(135deg, #ff5722, #ff9800);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-ver-detalle:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255, 87, 34, 0.3);
+}
+
+/* OBJETIVO */
+.detalle-objetivo {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: #292929;
+  padding: 15px;
+  border-radius: 12px;
+  margin: 20px 0;
+  border-left: 3px solid #ff5722;
+}
+
+.detalle-objetivo > span {
+  font-size: 25px;
+}
+
+.detalle-objetivo strong {
+  color: #ff9800;
+}
+
+.detalle-objetivo p {
+  margin: 5px 0 0;
+  color: white;
+}
+
+/* TÍTULO EJERCICIOS */
+.titulo-ejercicios {
+  color: white;
+  margin: 20px 0;
+}
+
+/* INFORMACIÓN DE EJERCICIOS */
+.ejercicio-informacion {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 15px;
+}
+
+.ejercicio-informacion > div {
+  background: #202020;
+  padding: 13px;
+  border-radius: 9px;
+  border-left: 2px solid #ff5722;
+}
+
+.ejercicio-informacion strong {
+  color: #ff9800;
+  font-size: 13px;
+}
+
+.ejercicio-informacion p {
+  color: #cccccc;
+  font-size: 13px;
+  line-height: 1.6;
+  margin: 7px 0 0;
+}
+
+/* TARJETA DE CADA EJERCICIO */
+.ejercicio-detalle-item {
+  display: flex;
+  gap: 15px;
+  background: #292929;
+  padding: 18px;
+  margin-bottom: 15px;
+  border-radius: 12px;
+  border-left: 3px solid #ff5722;
+}
+
+.ejercicio-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.ejercicio-info h4 {
+  color: white;
+  margin: 5px 0;
+  font-size: 16px;
+}
+
+.ejercicio-info > p {
+  color: #ff9800;
+  font-size: 13px;
+}
