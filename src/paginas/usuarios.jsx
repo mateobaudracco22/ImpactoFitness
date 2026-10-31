@@ -16,7 +16,7 @@ function MisRutinas() {
 
   const [rutinaSeleccionada, setRutinaSeleccionada] = useState(null);
   const [ejerciciosSeleccionado, setEjercicioSeleccionado] = useState(null);
-  <div></div>
+  
   
   const navigate = useNavigate();
 

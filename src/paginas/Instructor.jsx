@@ -408,22 +408,46 @@ function Instructor() {
                                 </button>
                                 <button className="btn-borrar-rutina" onClick={() => borrarRutina(rut.rutina_id || rut.id)}>
                                   🗑️ Borrar
-                                </button>
+                                </button>   
                               </div>
                             )}
                           </div>
 
-                          <div className="lista-ejercicios-vista">
-                            {ejerciciosLista.length > 0 ? (
-                              ejerciciosLista.main || ejerciciosLista.map((ej, idx) => (
-                                <div key={ej.id || idx} className="tarjeta-ejercicio-vista">
-                                  <div>
-                                    <p className="ejercicio-nombre-vista">{ej.nombre || ej.nombre_ejercicio || "Ejercicio"}</p>
-                                    {ej.descripcion && <p className="ejercicio-desc-vista">{ej.descripcion}</p>}
-                                  </div>
-                                  <span className="badge-series-reps">
-                                    {ej.series || 0} series x {ej.repeticiones || "0"}
-                                  </span>
+                        
+                                  <div className="lista-ejercicios-vista">
+  {ejerciciosLista.length > 0 ? (
+    ejerciciosLista.map((ej, idx) => (
+      <div key={ej.id || idx} className="tarjeta-ejercicio-vista">
+        {/* Lado izquierdo: Nombre y descripción del ejercicio */}
+        <div>
+          <p className="ejercicio-nombre-vista">{ej.nombre || ej.nombre_ejercicio || "Ejercicio"}</p>
+          {ej.descripcion && <p className="ejercicio-desc-vista">{ej.descripcion}</p>}
+        </div>
+        
+        {/* Lado derecho: Aquí agregué el contenedor con el badge y el botón */}
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "8px" }}>
+          <span className="badge-series-reps">
+            {ej.series || 0} series x {ej.repeticiones || "0"}
+          </span>
+          
+          {/* ---> NUEVO BOTÓN AÑADIDO AQUÍ <--- */}
+          <button 
+            type="button" 
+            className="btn-ver-rutina" 
+            style={{ padding: "6px 12px", fontSize: "0.85rem" }}
+            onClick={() => {
+              console.log("Iniciando ejercicio:", ej.nombre || ej.nombre_ejercicio);
+            }}
+          >
+            INICIAR RUTINA
+          </button>
+        </div>
+      </div>
+    ))
+  ) : (
+    <p className="texto-vacio texto-vacio-chico">Sin ejercicios asignados.</p>
+  )}
+</div>
                                 </div>
                               ))
                             ) : (
@@ -443,5 +467,6 @@ function Instructor() {
     </div>
   );
 }
+
 
 export default Instructor;
