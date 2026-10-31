@@ -15,8 +15,6 @@ function MisRutinas() {
   const [mensajeExito, setMensajeExito] = useState("");
 
   const [rutinaSeleccionada, setRutinaSeleccionada] = useState(null);
-  const [ejerciciosSeleccionado, setEjercicioSeleccionado] = useState(null);
-  
   
   const navigate = useNavigate();
 
@@ -216,6 +214,10 @@ function MisRutinas() {
                             </li>
                           ))}
                         </ul>
+                        <button className="btn-ver-detalle"
+                        onClick={() => setRutinaSeleccionada(rutina)}>
+                         <span>Detalle</span>Ver detalle de la ruitna 
+                        </button>
                       </div>
                     ))}
                   </div>
@@ -256,33 +258,126 @@ function MisRutinas() {
         )}
 
         {/* MODAL DETALLE DE RUTINA */}
-        {rutinaSeleccionada && (
-          <div className="modal-overlay-usuario" onClick={() => setRutinaSeleccionada(null)}>
-            <div className="modal-content-usuario" onClick={(e) => e.stopPropagation()}>
-              <div className="modal-header-usuario">
-                <h2>{rutinaSeleccionada.nombre_rutina}</h2>
-                <button className="btn-close-modal" onClick={() => setRutinaSeleccionada(null)}>✖</button>
-              </div>
-              <p className="modal-proposito"><strong>Objetivo:</strong> {rutinaSeleccionada.proposito}</p>
-              
-              <div className="modal-body-usuario">
-                {rutinaSeleccionada.ejercicios.length === 0 ? (
-                  <p>No hay ejercicios detallados para esta rutina.</p>
-                ) : (
-                  rutinaSeleccionada.ejercicios.map((ej, idx) => (
-                    <div key={idx} className="ejercicio-detalle-item">
-                      <div className="ejercicio-numero">{idx + 1}</div>
-                      <div className="ejercicio-info">
-                        <h4>{ej.nombre_ejercicio}</h4>
-                        <p>{ej.series} Series × {ej.repeticiones} Repeticiones</p>
-                      </div>
+       {/* MODAL DETALLE DE RUTINA */}
+{rutinaSeleccionada && (
+  <div
+    className="modal-overlay-usuario"
+    onClick={() => setRutinaSeleccionada(null)}
+  >
+    <div
+      className="modal-content-usuario"
+      onClick={(e) => e.stopPropagation()}
+    >
+
+      {/* ENCABEZADO */}
+      <div className="modal-header-usuario">
+        <div>
+          <h2>{rutinaSeleccionada.nombre_rutina}</h2>
+          <p>Información completa del entrenamiento</p>
+        </div>
+
+        <button
+          className="btn-close-modal"
+          onClick={() => setRutinaSeleccionada(null)}
+        >
+          ✖
+        </button>
+      </div>
+
+      {/* OBJETIVO */}
+      <div className="detalle-objetivo">
+        <span>🎯</span>
+        <div>
+          <strong>Objetivo de la rutina</strong>
+          <p>{rutinaSeleccionada.proposito}</p>
+        </div>
+      </div>
+
+      {/* EJERCICIOS */}
+      <div className="modal-body-usuario">
+
+        <h3 className="titulo-ejercicios">
+          🏋️ Ejercicios del entrenamiento
+        </h3>
+
+        {rutinaSeleccionada.ejercicios.length === 0 ? (
+          <p>No hay ejercicios asignados.</p>
+        ) : (
+
+          rutinaSeleccionada.ejercicios.map((ej, idx) => {
+
+            const instrucciones = ej.instrucciones || ej.ejecucion;
+            const musculos = ej.musculos_trabajados || ej.musculos;
+
+            return (
+              <div
+                key={idx}
+                className="ejercicio-detalle-item"
+              >
+
+                <div className="ejercicio-numero">
+                  {idx + 1}
+                </div>
+
+                <div className="ejercicio-info">
+
+                  <h4>{ej.nombre_ejercicio}</h4>
+
+                  <p>
+                    {ej.series} Series × {ej.repeticiones} Repeticiones
+                  </p>
+
+                  <div className="ejercicio-informacion">
+
+                    <div>
+                      <strong>📖 ¿Cómo se realiza?</strong>
+                      <p>
+                        {instrucciones ||
+                          "El instructor todavía no ha cargado las instrucciones de este ejercicio."}
+                      </p>
                     </div>
-                  ))
-                )}
+
+                    <div>
+                      <strong>💪 Músculos trabajados</strong>
+                      <p>
+                        {musculos || "Información no disponible."}
+                      </p>
+                    </div>
+
+                    <div>
+                      <strong>⏱️ Descanso</strong>
+                      <p>
+                        {ej.descanso || "Consultar con el instructor."}
+                      </p>
+                    </div>
+
+                    <div>
+                      <strong>🏋️ Equipamiento</strong>
+                      <p>
+                        {ej.equipamiento || "Consultar con el instructor."}
+                      </p>
+                    </div>
+
+                    <div>
+                      <strong>💡 Consejo</strong>
+                      <p>
+                        {ej.consejos || "Realizá el movimiento de forma controlada y con una técnica correcta."}
+                      </p>
+                    </div>
+
+                  </div>
+
+                </div>
               </div>
-            </div>
-          </div>
+            );
+          })
         )}
+
+      </div>
+
+    </div>
+  </div>
+)}
       </main>
     </div>
   );
