@@ -1,6 +1,7 @@
 .solicitar {
     background: linear-gradient(to right, #121212, #ff5722);
-    background-attachment: fixed;
+    background-size: 200% 100%;
+    animation: mover-fondo 10s ease infinite;
     font-family: Arial, sans-serif;
     color: #ffffff;
     min-height: 100vh;
@@ -131,6 +132,12 @@
     border: 1px solid #f44336;
     border-radius: 8px;
     color: #ef9a9a;
+}
+
+@keyframes mover-fondo {
+    0%   { background-position: left; }
+    50%  { background-position: right; }
+    100% { background-position: left; }
 }
 
 /* Celulares */

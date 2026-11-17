@@ -110,6 +110,20 @@ async function inicializarBaseDeDatos() {
                 FOREIGN KEY (ejercicio_id) REFERENCES Ejercicios(id) ON DELETE CASCADE
             );
         `);
+        await conexion.query(`
+            CREATE TABLE IF NOT EXISTS Solicitudes_Rutina (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                usuario_id INT NOT NULL,
+                meta_id INT NOT NULL,
+                nivel ENUM('principiante', 'intermedio', 'avanzado') NOT NULL,
+                dias_por_semana INT NOT NULL,
+                observaciones TEXT,
+                estado ENUM('pendiente', 'atendida') DEFAULT 'pendiente',
+                fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (usuario_id) REFERENCES Usuarios(id) ON DELETE CASCADE,
+                FOREIGN KEY (meta_id) REFERENCES metas(id)
+            );
+        `);
 
         // 4. Insertar Metas por defecto si está vacía
         const [metasCheck] = await conexion.query("SELECT COUNT(*) as total FROM metas");
@@ -444,6 +458,21 @@ app.put('/api/usuarios/:id/meta', async (req, res) => {
         res.json({ mensaje: 'Meta actualizada correctamente.' });
     } catch (error) {
         res.status(500).json({ error: 'Error al actualizar la meta en la base de datos.' });
+    }
+});
+
+// Guardar una solicitud de rutina (formulario del usuario)
+app.post('/api/solicitudes-rutina', async (req, res) => {
+    const { usuario_id, meta_id, nivel, dias_por_semana, observaciones } = req.body;
+    try {
+        await db.query(
+            `INSERT INTO Solicitudes_Rutina (usuario_id, meta_id, nivel, dias_por_semana, observaciones)
+             VALUES (?, ?, ?, ?, ?)`,
+            [usuario_id, meta_id, nivel, dias_por_semana, observaciones || null]
+        );
+        res.status(201).json({ mensaje: 'Solicitud enviada con éxito' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
     }
 });
 
