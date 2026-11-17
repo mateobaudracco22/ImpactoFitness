@@ -161,7 +161,7 @@ function MisRutinas() {
           </button>
           <button 
             className={`menu-item ${seccionActiva === "rutinas" ? "activo" : ""}`}
-            onClick={() => navigate("/Formulario")}
+            onClick={() => navigate("/Solicitud_Rutina")}
           >
              Solicitar rutina
           </button>

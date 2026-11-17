@@ -3,7 +3,7 @@ import Informacion from "./src/paginas/informacion.jsx";
 import Instructor from "./src/paginas/instructor.jsx";
 import Usuarios from "./src/paginas/usuarios.jsx";
 import CrearCuenta from "./src/paginas/crear.cuenta.jsx";
-import Formulario from "./src/paginas/formulario.jsx";
+import Solicitud_Rutina from "./src/paginas/Solicitud_Rutina.jsx";
 
 
 import { BrowserRouter, Route, Routes } from "react-router-dom";
@@ -18,7 +18,7 @@ function App() {
         <Route path="/instructor" element={<Instructor />} />
         <Route path="/crear.cuenta" element={<CrearCuenta />} />
         <Route path="/usuarios" element={<Usuarios />} />
-        <Route path="/formulario" element={<Formulario />} />
+        <Route path="/Solicitud_Rutina" element={<Solicitud_Rutina />} />
       </Routes>
     </BrowserRouter>
   );
