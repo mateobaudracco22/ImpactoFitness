@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "../estilos/formulario.css";
+import "../estilos/Solicitud_Rutina.css";
 
 function SolicitarRutina() {
   const [usuario, setUsuario] = useState(null);
