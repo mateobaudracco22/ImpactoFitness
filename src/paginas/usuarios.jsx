@@ -159,6 +159,12 @@ function MisRutinas() {
           >
              Información del Gimnasio
           </button>
+          <button 
+            className={`menu-item ${seccionActiva === "rutinas" ? "activo" : ""}`}
+            onClick={() => setSeccionActiva("rutinas")}
+          >
+             Solicitar rutina
+          </button>
         </nav>
 
         <div className="menu-footer">
