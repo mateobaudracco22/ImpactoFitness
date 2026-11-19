@@ -1,11 +1,8 @@
 import Login from "/src/paginas/login.jsx";
 import Informacion from "./src/paginas/informacion.jsx";
-import Instructor from "./src/paginas/instructor.jsx";
+import Instructor from "./src/paginas/Instructor.jsx";
 import Usuarios from "./src/paginas/usuarios.jsx";
 import CrearCuenta from "./src/paginas/crear.cuenta.jsx";
-import Solicitud_Rutina from "./src/paginas/Solicitud_Rutina.jsx";
-
-
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 function App() {
@@ -18,7 +15,6 @@ function App() {
         <Route path="/instructor" element={<Instructor />} />
         <Route path="/crear.cuenta" element={<CrearCuenta />} />
         <Route path="/usuarios" element={<Usuarios />} />
-        <Route path="/Solicitud_Rutina" element={<Solicitud_Rutina />} />
       </Routes>
     </BrowserRouter>
   );
