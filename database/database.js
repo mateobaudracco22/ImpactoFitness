@@ -125,6 +125,8 @@ async function inicializarBaseDeDatos() {
             );
         `);
 
+//aca va las consultas de la tabla de las solicitudes del instructor
+
         // 4. Insertar Metas por defecto si está vacía
         const [metasCheck] = await conexion.query("SELECT COUNT(*) as total FROM metas");
         if (metasCheck[0].total === 0) {
