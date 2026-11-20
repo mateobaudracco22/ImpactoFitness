@@ -235,7 +235,7 @@ function Instructor() {
                     <h3 className="alumno-nombre">{alumno.nombre_completo}</h3>
                     
                     <div className="badge-meta-alumno">
-                      <span>{alumno.meta_icono || "🎯"}</span>
+                      <span>{alumno.meta_icono || "🎯ver solicitudes"}</span>
                       <span className="texto-meta-alumno">{alumno.meta_nombre || "General"}</span>
                     </div>
                   </div>
