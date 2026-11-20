@@ -18,7 +18,7 @@ function App() {
         <Route path="/instructor" element={<Instructor />} />
         <Route path="/crear.cuenta" element={<CrearCuenta />} />
         <Route path="/usuarios" element={<Usuarios />} />
-        <Route path="/Solicitud_Rutina" element={<Solicitud_Rutina />} />
+        <Route path="/Solicitud_Rutina" element={<SolicitarRutina />} />
         <Route path="/notificacion_ins" element={<NotificacionIns/>}/>
       </Routes>
     </BrowserRouter>
