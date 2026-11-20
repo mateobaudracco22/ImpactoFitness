@@ -1,0 +1,281 @@
+
+.notificaciones-container {
+  min-height: 100vh;
+  background: #121212;
+  color: #fff;
+  padding: 35px;
+  font-family: Arial, sans-serif;
+}
+
+/* ENCABEZADO */
+
+.notificaciones-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  background: #1a1a1a;
+  padding: 25px;
+  border-radius: 15px;
+  border: 1px solid #303030;
+}
+
+.titulo-notificaciones {
+  flex: 1;
+}
+
+.titulo-notificaciones h1 {
+  margin: 0;
+  font-size: 27px;
+}
+
+.titulo-notificaciones p {
+  color: #aaa;
+  margin-bottom: 0;
+}
+
+.btn-volver {
+  background: #292929;
+  color: white;
+  border: 1px solid #444;
+  padding: 12px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.btn-volver:hover {
+  background: #ff5722;
+}
+
+.contador-solicitudes {
+  background: #292929;
+  padding: 12px 22px;
+  border-radius: 10px;
+  text-align: center;
+  min-width: 100px;
+}
+
+.contador-solicitudes span {
+  color: #ff5722;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.contador-solicitudes p {
+  margin: 5px 0 0;
+  color: #aaa;
+  font-size: 12px;
+}
+
+/* CONTENIDO */
+
+.notificaciones-contenido {
+  margin-top: 35px;
+}
+
+.encabezado-solicitudes {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.encabezado-solicitudes h2 {
+  margin: 0 0 8px;
+}
+
+.encabezado-solicitudes p {
+  color: #999;
+  margin: 0;
+}
+
+.btn-actualizar {
+  background: #292929;
+  color: white;
+  border: 1px solid #444;
+  padding: 12px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-actualizar:hover {
+  background: #ff5722;
+}
+
+/* TARJETAS */
+
+.solicitudes-grid {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(290px, 1fr)
+  );
+  gap: 22px;
+}
+
+.solicitud-card {
+  background: #242424;
+  border: 1px solid #363636;
+  border-radius: 15px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  transition: 0.3s;
+}
+
+.solicitud-card:hover {
+  border-color: #ff5722;
+  transform: translateY(-3px);
+}
+
+.solicitud-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.solicitud-icono {
+  width: 55px;
+  height: 55px;
+  background: #353535;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 27px;
+}
+
+.estado-solicitud {
+  color: #ff9800;
+  background: #3b2c1c;
+  padding: 7px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+}
+
+.solicitud-info h3 {
+  font-size: 20px;
+  margin: 0 0 12px;
+}
+
+.solicitud-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #ff9800;
+}
+
+/* INFORMACIÓN */
+
+.datos-solicitud {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  background: #1b1b1b;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.dato-solicitud {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid #333;
+  padding-bottom: 10px;
+}
+
+.dato-solicitud:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.dato-solicitud span {
+  color: #aaa;
+  font-size: 13px;
+}
+
+.dato-solicitud strong {
+  color: #fff;
+  font-size: 13px;
+  text-align: right;
+}
+
+.dato-observaciones {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.dato-observaciones p {
+  color: #ddd;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+/* BOTÓN */
+
+.btn-aceptar-solicitud {
+  background: #ff5722;
+  color: white;
+  border: none;
+  padding: 14px;
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-aceptar-solicitud:hover {
+  background: #e64a19;
+  transform: scale(1.02);
+}
+
+/* SIN SOLICITUDES */
+
+.sin-solicitudes {
+  background: #242424;
+  padding: 60px 20px;
+  border-radius: 15px;
+  text-align: center;
+  border: 1px solid #363636;
+}
+
+.sin-solicitudes span {
+  font-size: 45px;
+}
+
+.sin-solicitudes p {
+  color: #aaa;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 650px) {
+  .notificaciones-container {
+    padding: 15px;
+  }
+
+  .notificaciones-header {
+    flex-wrap: wrap;
+  }
+
+  .titulo-notificaciones h1 {
+    font-size: 21px;
+  }
+
+  .encabezado-solicitudes {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .solicitudes-grid {
+    grid-template-columns: 1fr;
+  }
+}
