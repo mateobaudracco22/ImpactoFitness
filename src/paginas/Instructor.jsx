@@ -240,7 +240,7 @@ function Instructor() {
                     </div>
                   </div>
                   <button className="btn-notificacion"
-                  onClick={() => navigate("/Notificacion_Ins")}
+                  onClick={() => navigate("/notificacion_ins")}
                   >
                     ver solicitudes
                   </button>
