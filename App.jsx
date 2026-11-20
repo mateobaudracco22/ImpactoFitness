@@ -3,7 +3,7 @@ import Informacion from "./src/paginas/informacion.jsx";
 import Instructor from "./src/paginas/Instructor.jsx";
 import Usuarios from "./src/paginas/usuarios.jsx";
 import CrearCuenta from "./src/paginas/crear.cuenta.jsx";
-import notificacion_ins from "./paginas/notificacion_ins.jsx";
+import notificacion_ins from "./src/paginas/notificacion_ins.jsx";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 function App() {
