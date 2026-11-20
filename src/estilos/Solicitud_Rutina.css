@@ -1,154 +1,312 @@
+
+/* ==============================
+   ESTILOS GENERALES
+============================== */
+
 .solicitar {
-    background: linear-gradient(to right, #121212, #ff5722);
-    background-size: 200% 100%;
-    animation: mover-fondo 10s ease infinite;
-    font-family: Arial, sans-serif;
-    color: #ffffff;
     min-height: 100vh;
+    background:
+        radial-gradient(circle at top right, rgba(255, 87, 34, 0.12), transparent 35%),
+        linear-gradient(135deg, #121212, #1a1a1a 60%, #24150f);
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: #ffffff;
+    overflow-x: hidden;
 }
 
-/* Encabezado */
+/* ==============================
+   ENCABEZADO
+============================== */
+
 .solicitar-header {
-    background-color: #2a2a2a;
+    background: rgba(30, 30, 30, 0.95);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 25px 40px;
-    border-bottom: 3px solid #ff5722;
+    padding: 22px 7%;
+    border-bottom: 1px solid rgba(255, 87, 34, 0.45);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
     gap: 20px;
 }
 
 .solicitar-header h1 {
     margin: 0;
     font-size: 1.8rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: #ffffff;
 }
 
+.solicitar-header h1::first-letter {
+    color: #ff5722;
+}
+
+/* Botón volver */
+
 .solicitar-btn-volver {
-    padding: 10px 18px;
-    background-color: #ff9800;
-    color: #121212;
-    border: none;
+    padding: 11px 22px;
+    background: transparent;
+    color: #ff9800;
+    border: 1px solid #ff9800;
     border-radius: 8px;
-    font-weight: bold;
+    font-weight: 600;
+    font-size: 0.95rem;
     cursor: pointer;
-    transition: 0.3s ease;
+    transition: all 0.3s ease;
 }
 
 .solicitar-btn-volver:hover {
-    background-color: #ffb74d;
+    background: #ff9800;
+    color: #121212;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 152, 0, 0.2);
 }
 
-/* Contenedor y formulario */
+/* ==============================
+   CONTENEDOR PRINCIPAL
+============================== */
+
 .solicitar-contenedor {
     display: flex;
     justify-content: center;
-    padding: 40px 20px;
+    align-items: flex-start;
+    padding: 65px 20px;
 }
+
+/* ==============================
+   FORMULARIO
+============================== */
 
 .solicitar-form {
     box-sizing: border-box;
-    background-color: rgb(41, 39, 35);
+    background: linear-gradient(145deg, #242424, #1c1c1c);
     width: 100%;
-    max-width: 500px;
-    padding: 30px;
-    border: 2px solid #3a3a3a;
-    border-radius: 15px;
-    box-shadow: 0 0 10px rgba(255, 87, 34, 0.15);
+    max-width: 520px;
+    padding: 38px;
+    border: 1px solid #383838;
+    border-radius: 18px;
+
+    box-shadow:
+        0 15px 40px rgba(0, 0, 0, 0.4),
+        0 0 20px rgba(255, 87, 34, 0.05);
+
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
+
+.solicitar-form:hover {
+    box-shadow:
+        0 18px 45px rgba(0, 0, 0, 0.5),
+        0 0 25px rgba(255, 87, 34, 0.09);
+}
+
+/* Introducción */
 
 .solicitar-intro {
     margin-top: 0;
+    margin-bottom: 28px;
     color: #b0b0b0;
-    line-height: 1.6;
+    font-size: 0.96rem;
+    line-height: 1.7;
 }
+
+/* ==============================
+   LABELS
+============================== */
 
 .solicitar-form label {
     display: block;
-    margin: 18px 0 6px 0;
+    margin: 22px 0 9px;
     color: #ff9800;
-    font-weight: bold;
+    font-size: 0.93rem;
+    font-weight: 600;
+    letter-spacing: 0.2px;
 }
+
+/* ==============================
+   CAMPOS DEL FORMULARIO
+============================== */
 
 .solicitar-form select,
 .solicitar-form textarea {
     box-sizing: border-box;
     width: 100%;
-    padding: 10px;
-    background-color: #1e1e1e;
+    padding: 13px 15px;
+
+    background-color: #171717;
     color: #ffffff;
-    border: 1px solid #3a3a3a;
-    border-radius: 8px;
-    font-family: Arial, sans-serif;
-    font-size: 1rem;
+
+    border: 1px solid #3b3b3b;
+    border-radius: 9px;
+
+    font-family: inherit;
+    font-size: 0.95rem;
+
+    transition: all 0.25s ease;
+}
+
+.solicitar-form select {
+    cursor: pointer;
+}
+
+.solicitar-form select:hover,
+.solicitar-form textarea:hover {
+    border-color: #666666;
 }
 
 .solicitar-form select:focus,
 .solicitar-form textarea:focus {
     outline: none;
-    border-color: #ff9800;
+    border-color: #ff5722;
+    box-shadow: 0 0 0 3px rgba(255, 87, 34, 0.12);
+    background-color: #1e1e1e;
 }
 
 .solicitar-form textarea {
-    height: 100px;
+    min-height: 120px;
     resize: vertical;
+    line-height: 1.5;
 }
 
-/* Botón enviar */
+.solicitar-form textarea::placeholder {
+    color: #777777;
+}
+
+/* ==============================
+   BOTÓN ENVIAR
+============================== */
+
 .solicitar-btn-enviar {
     width: 100%;
-    margin-top: 25px;
-    padding: 12px;
-    background-color: #ff5722;
+    margin-top: 30px;
+    padding: 14px;
+
+    background: linear-gradient(135deg, #ff5722, #ff7043);
     color: #ffffff;
+
     border: none;
-    border-radius: 8px;
+    border-radius: 9px;
+
     font-size: 1rem;
-    font-weight: bold;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+
     cursor: pointer;
-    transition: 0.3s ease;
+    transition: all 0.3s ease;
+
+    box-shadow: 0 5px 15px rgba(255, 87, 34, 0.2);
 }
 
-.solicitar-btn-enviar:hover {
-    background-color: #ff9800;
+.solicitar-btn-enviar:hover:not(:disabled) {
+    background: linear-gradient(135deg, #ff9800, #ffb74d);
+    color: #121212;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(255, 152, 0, 0.25);
+}
+
+.solicitar-btn-enviar:active:not(:disabled) {
+    transform: translateY(0);
 }
 
 .solicitar-btn-enviar:disabled {
-    opacity: 0.6;
+    opacity: 0.5;
     cursor: not-allowed;
+    box-shadow: none;
 }
 
-/* Mensajes */
+/* ==============================
+   MENSAJES
+============================== */
+
+.solicitar-exito,
+.solicitar-error {
+    padding: 13px 15px;
+    margin-top: 18px;
+    border-radius: 9px;
+    font-size: 0.92rem;
+    line-height: 1.5;
+}
+
 .solicitar-exito {
-    padding: 10px;
-    background-color: rgba(76, 175, 80, 0.2);
-    border: 1px solid #4caf50;
-    border-radius: 8px;
+    background: rgba(76, 175, 80, 0.10);
+    border: 1px solid rgba(76, 175, 80, 0.5);
     color: #a5d6a7;
 }
 
 .solicitar-error {
-    padding: 10px;
-    background-color: rgba(244, 67, 54, 0.2);
-    border: 1px solid #f44336;
-    border-radius: 8px;
+    background: rgba(244, 67, 54, 0.10);
+    border: 1px solid rgba(244, 67, 54, 0.5);
     color: #ef9a9a;
 }
 
-@keyframes mover-fondo {
-    0%   { background-position: left; }
-    50%  { background-position: right; }
-    100% { background-position: left; }
+/* ==============================
+   ANIMACIONES
+============================== */
+
+@keyframes aparecer {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-/* Celulares */
+.solicitar-form {
+    animation: aparecer 0.6s ease;
+}
+
+/* ==============================
+   RESPONSIVE - TABLETS Y CELULARES
+============================== */
+
 @media (max-width: 768px) {
+
     .solicitar-header {
         flex-direction: column;
         text-align: center;
-        padding: 20px;
+        padding: 22px 20px;
+    }
+
+    .solicitar-header h1 {
+        font-size: 1.5rem;
+    }
+
+    .solicitar-contenedor {
+        padding: 35px 16px;
     }
 
     .solicitar-form {
-        padding: 20px;
+        padding: 25px 22px;
+    }
+}
+
+@media (max-width: 400px) {
+
+    .solicitar-form {
+        padding: 22px 17px;
+    }
+
+    .solicitar-header h1 {
+        font-size: 1.3rem;
+    }
+
+    .solicitar-btn-volver {
+        width: 100%;
+    }
+}
+
+/* Accesibilidad: reducir animaciones si el usuario lo prefiere */
+
+@media (prefers-reduced-motion: reduce) {
+    .solicitar-form {
+        animation: none;
+    }
+
+    .solicitar *,
+    .solicitar *::before,
+    .solicitar *::after {
+        transition: none !important;
     }
 }
