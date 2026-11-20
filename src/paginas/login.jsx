@@ -9,6 +9,14 @@ function Login({ onLoginExitoso }) {
   const [error, setError] = useState("");
 
   const navigate = useNavigate();
+  //nuevos agregados
+  const ubicacion = useLocation();
+  const destino = ubicacion.state?.desde?.pathname || "/";
+  const manejarLogin = async (e) => {
+    e.preventDefault();
+    // ... signInWithEmailAndPassword(auth, email, password) ...
+    navigate(destino, { replace: true });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();

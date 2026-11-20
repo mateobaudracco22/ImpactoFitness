@@ -5,6 +5,7 @@ import Usuarios from "./src/paginas/usuarios.jsx";
 import CrearCuenta from "./src/paginas/crear.cuenta.jsx";
 import Solicitud_Rutina from "./src/paginas/Solicitud_Rutina.jsx";
 import notificacion_ins from "./src/paginas/notificacion_ins.jsx";
+import RutaProtegida from "./componentes/Rutaprotegida.jsx";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 
@@ -13,13 +14,13 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Informacion />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/informacion" element={<Informacion />} />
-        <Route path="/instructor" element={<Instructor />} />
-        <Route path="/crear.cuenta" element={<CrearCuenta />} />
-        <Route path="/usuarios" element={<Usuarios />} />
-        <Route path="/Solicitud_Rutina" element={<Solicitud_Rutina/>} />
-        <Route path="/notificacion_ins" element={<notificacion_ins/>}/>
+        <Route path="/login" element={<RutaProtegida><Login/></RutaProtegida>} />
+        <Route path="/informacion" element={<RutaProtegida><Informacion /></RutaProtegida>} />
+        <Route path="/instructor" element={<RutaProtegida><Instructor/></RutaProtegida>} />
+        <Route path="/crear.cuenta" element={<RutaProtegida><CrearCuenta/></RutaProtegida>} />
+        <Route path="/usuarios" element={<RutaProtegida><Usuarios/></RutaProtegida>} />
+        <Route path="/Solicitud_Rutina" element={<RutaProtegida><Solicitud_Rutina/></RutaProtegida>} />
+        <Route path="/notificacion_ins" element={<RutaProtegida><notificacion_ins/></RutaProtegida>}/>
       </Routes>
     </BrowserRouter>
   );
