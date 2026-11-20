@@ -3,6 +3,7 @@ import Informacion from "./src/paginas/informacion.jsx";
 import Instructor from "./src/paginas/Instructor.jsx";
 import Usuarios from "./src/paginas/usuarios.jsx";
 import CrearCuenta from "./src/paginas/crear.cuenta.jsx";
+import notificacion_ins from "./paginas/notificacion_ins.jsx";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
         <Route path="/instructor" element={<Instructor />} />
         <Route path="/crear.cuenta" element={<CrearCuenta />} />
         <Route path="/usuarios" element={<Usuarios />} />
+        <Route path="/notificacion_ins" element={<notificacion_ins/>}/>
       </Routes>
     </BrowserRouter>
   );
