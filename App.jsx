@@ -5,7 +5,6 @@ import Usuarios from "./src/paginas/usuarios.jsx";
 import CrearCuenta from "./src/paginas/crear.cuenta.jsx";
 import Solicitud_Rutina from "./src/paginas/Solicitud_Rutina.jsx";
 import notificacion_ins from "./src/paginas/notificacion_ins.jsx";
-import RutaProtegida from "./componentes/Rutaprotegida.jsx";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 
