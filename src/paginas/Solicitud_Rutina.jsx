@@ -156,4 +156,4 @@ function SolicitarRutina() {
   );
 }
 
-export default Solicitud_Rutina;
+export default SolicitarRutina;

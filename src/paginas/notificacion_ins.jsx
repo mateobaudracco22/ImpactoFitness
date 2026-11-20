@@ -262,4 +262,4 @@ function Notificacion_Ins() {
   );
 
 
-export default notificacion_ins;
+export default Notificacion_Ins;
