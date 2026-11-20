@@ -126,6 +126,24 @@ async function inicializarBaseDeDatos() {
         `);
 
 //aca va las consultas de la tabla de las solicitudes del instructor
+// Listar solicitudes pendientes (para el instructor)
+app.get('/api/solicitudes-rutina', async (req, res) => {
+    try {
+        const [solicitudes] = await db.query(`
+            SELECT s.id, s.usuario_id, u.nombre_completo,
+                   m.nombre AS meta_nombre, m.icono AS meta_icono,
+                   s.nivel, s.dias_por_semana, s.observaciones, s.fecha
+            FROM Solicitudes_Rutina s
+            JOIN Usuarios u ON s.usuario_id = u.id
+            JOIN metas m ON s.meta_id = m.id
+            WHERE s.estado = 'pendiente'
+            ORDER BY s.fecha DESC
+        `);
+        res.json(solicitudes);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
 
         // 4. Insertar Metas por defecto si está vacía
         const [metasCheck] = await conexion.query("SELECT COUNT(*) as total FROM metas");
