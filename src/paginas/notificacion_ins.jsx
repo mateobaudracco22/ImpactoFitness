@@ -1,6 +1,7 @@
-import React, {useState, useEffect} from "react";
+
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "../estilos/Noti_ins.css";
+import "../estilos/notificacion.css";
 
 function Notificacion_Ins() {
   const navigate = useNavigate();
@@ -19,8 +20,7 @@ function Notificacion_Ins() {
     } else {
       navigate("/");
     }
-  }, []);}
-
+  }, []);
 
   // Cargar solicitudes pendientes desde la base de datos
   const cargarSolicitudes = async () => {
@@ -47,7 +47,7 @@ function Notificacion_Ins() {
     }
   };
 
-   // Aceptar solicitud y asignar alumno al instructor
+  // Aceptar solicitud y asignar alumno al instructor
   const aceptarSolicitud = async (solicitud) => {
     if (!instructor) return;
 
@@ -78,7 +78,7 @@ function Notificacion_Ins() {
 
       alert("¡Solicitud aceptada correctamente!");
 
-        // Actualizar la lista
+      // Actualizar la lista
       cargarSolicitudes();
 
     } catch (error) {
@@ -86,7 +86,8 @@ function Notificacion_Ins() {
       alert("No se pudo aceptar la solicitud.");
     }
   };
-   // Formatear fecha
+
+  // Formatear fecha
   const formatearFecha = (fecha) => {
     if (!fecha) return "Sin fecha";
 
@@ -101,7 +102,7 @@ function Notificacion_Ins() {
     });
   };
 
- return (
+  return (
     <div className="notificaciones-container">
 
       {/* ENCABEZADO */}
@@ -260,6 +261,6 @@ function Notificacion_Ins() {
 
     </div>
   );
-
+}
 
 export default Notificacion_Ins;
