@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "../estilos/notificacion.css";
+import "../estilos/Noti_Ins.css";
 
 function Notificacion_Ins() {
   const navigate = useNavigate();
