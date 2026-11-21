@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexto/AuthContext.jsx";
 import "../estilos/login.css";
 
 function Login({ onLoginExitoso }) {
@@ -9,14 +10,7 @@ function Login({ onLoginExitoso }) {
   const [error, setError] = useState("");
 
   const navigate = useNavigate();
-  //nuevos agregados
-  const ubicacion = useLocation();
-  const destino = ubicacion.state?.desde?.pathname || "/";
-  const manejarLogin = async (e) => {
-    e.preventDefault();
-    // ... signInWithEmailAndPassword(auth, email, password) ...
-    navigate(destino, { replace: true });
-  };
+  const { iniciarSesion } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -38,8 +32,8 @@ function Login({ onLoginExitoso }) {
         return;
       }
 
-      // Guardar los datos del usuario en el navegador
-      localStorage.setItem("usuario", JSON.stringify(datos.usuario));
+      // Guardar los datos del usuario en el navegador y en el AuthContext
+      iniciarSesion(datos.usuario);
 
       if (onLoginExitoso) {
         onLoginExitoso(datos.usuario);

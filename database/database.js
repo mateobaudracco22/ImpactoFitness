@@ -125,26 +125,6 @@ async function inicializarBaseDeDatos() {
             );
         `);
 
-//aca va las consultas de la tabla de las solicitudes del instructor
-// Listar solicitudes pendientes (para el instructor)
-app.get('/api/solicitudes-rutina', async (req, res) => {
-    try {
-        const [solicitudes] = await db.query(`
-            SELECT s.id, s.usuario_id, u.nombre_completo,
-                   m.nombre AS meta_nombre, m.icono AS meta_icono,
-                   s.nivel, s.dias_por_semana, s.observaciones, s.fecha
-            FROM Solicitudes_Rutina s
-            JOIN Usuarios u ON s.usuario_id = u.id
-            JOIN metas m ON s.meta_id = m.id
-            WHERE s.estado = 'pendiente'
-            ORDER BY s.fecha DESC
-        `);
-        res.json(solicitudes);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
         // 4. Insertar Metas por defecto si está vacía
         const [metasCheck] = await conexion.query("SELECT COUNT(*) as total FROM metas");
         if (metasCheck[0].total === 0) {
@@ -272,7 +252,7 @@ app.get('/api/solicitudes', async (req, res) => {
 
 app.put('/api/alumnos/:id/asignar', async (req, res) => {
     const alumnoId = req.params.id;
-    const { instructor_id } = req.body;
+    const { instructor_id, solicitud_id } = req.body;
 
     try {
         const [resultado] = await db.query(
@@ -282,6 +262,14 @@ app.put('/api/alumnos/:id/asignar', async (req, res) => {
 
         if (resultado.affectedRows === 0) {
             return res.status(404).json({ error: 'Alumno no encontrado.' });
+        }
+
+        // Si viene de una solicitud de rutina, se marca como atendida
+        if (solicitud_id) {
+            await db.query(
+                "UPDATE Solicitudes_Rutina SET estado = 'atendida' WHERE id = ?",
+                [solicitud_id]
+            );
         }
 
         res.json({ mensaje: 'Alumno asignado correctamente.' });
@@ -491,6 +479,38 @@ app.post('/api/solicitudes-rutina', async (req, res) => {
             [usuario_id, meta_id, nivel, dias_por_semana, observaciones || null]
         );
         res.status(201).json({ mensaje: 'Solicitud enviada con éxito' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Listar solicitudes de rutina pendientes (para el instructor)
+app.get('/api/solicitudes-rutina', async (req, res) => {
+    try {
+        const [solicitudes] = await db.query(`
+            SELECT s.id, s.usuario_id, u.nombre_completo,
+                   m.nombre AS meta_nombre, m.icono AS meta_icono,
+                   s.nivel, s.dias_por_semana, s.observaciones, s.fecha
+            FROM Solicitudes_Rutina s
+            JOIN Usuarios u ON s.usuario_id = u.id
+            JOIN metas m ON s.meta_id = m.id
+            WHERE s.estado = 'pendiente'
+            ORDER BY s.fecha DESC
+        `);
+        res.json(solicitudes);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Devuelve el rol real del usuario guardado en la base de datos
+app.get('/api/usuarios/:id/rol', async (req, res) => {
+    try {
+        const [filas] = await db.query('SELECT rol FROM Usuarios WHERE id = ?', [req.params.id]);
+        if (filas.length === 0) {
+            return res.status(404).json({ error: 'Usuario no encontrado.' });
+        }
+        res.json({ rol: filas[0].rol });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

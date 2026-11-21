@@ -394,3 +394,28 @@
   height: 15px;
   cursor: pointer;
 }
+
+/* Botones del encabezado del instructor */
+.acciones-header {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.btn-notificacion {
+  background-color: var(--acento-principal);
+  color: var(--texto-blanco);
+  border: 2px solid var(--acento-principal);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-notificacion:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 87, 34, 0.3);
+}

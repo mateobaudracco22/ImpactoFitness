@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../estilos/Noti_Ins.css";
@@ -22,13 +21,13 @@ function Notificacion_Ins() {
     }
   }, []);
 
-  // Cargar solicitudes pendientes desde la base de datos
+  // Cargar solicitudes de rutina pendientes desde la base de datos
   const cargarSolicitudes = async () => {
     try {
       setCargando(true);
 
       const res = await fetch(
-        "http://localhost:3000/api/solicitudes"
+        "http://localhost:3000/api/solicitudes-rutina"
       );
 
       if (!res.ok) {
@@ -163,7 +162,7 @@ function Notificacion_Ins() {
             <span>📭</span>
             <h3>No hay solicitudes pendientes</h3>
             <p>
-              Cuando un alumno solicite un instructor,
+              Cuando un alumno solicite una rutina,
               aparecerá en esta sección.
             </p>
           </div>

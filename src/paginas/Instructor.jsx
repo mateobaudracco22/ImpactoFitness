@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "../estilos/instructor.css";
 
 function Instructor() {
@@ -24,6 +25,8 @@ function Instructor() {
   const [verRutinaModal, setVerRutinaModal] = useState(null);
   const [rutinaAlumno, setRutinaAlumno] = useState([]);
   const [cargandoRutina, setCargandoRutina] = useState(false);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const usuarioGuardado = localStorage.getItem("usuario");
@@ -214,9 +217,14 @@ function Instructor() {
             <h1 className="header-title">Panel del Instructor</h1>
             <p className="header-subtitle">{instructor ? `Bienvenido/a, ${instructor.nombre_completo}` : ""}</p>
           </div>
-          <button className="btn-cerrar-sesion" onClick={cerrarSesion}>
-            Cerrar Sesión 🚪
-          </button>
+          <div className="acciones-header">
+            <button className="btn-notificacion" onClick={() => navigate("/notificacion_ins")}>
+              📩 Ver solicitudes
+            </button>
+            <button className="btn-cerrar-sesion" onClick={cerrarSesion}>
+              Cerrar Sesión 🚪
+            </button>
+          </div>
         </header>
 
         <section className="metrics-grid">
@@ -235,15 +243,10 @@ function Instructor() {
                     <h3 className="alumno-nombre">{alumno.nombre_completo}</h3>
                     
                     <div className="badge-meta-alumno">
-                      <span>{alumno.meta_icono || "🎯ver solicitudes"}</span>
+                      <span>{alumno.meta_icono || "🎯"}</span>
                       <span className="texto-meta-alumno">{alumno.meta_nombre || "General"}</span>
                     </div>
                   </div>
-                  <button className="btn-notificacion"
-                  onClick={() => navigate("/notificacion_ins.jsx")}
-                  >
-                    ver solicitudes
-                  </button>
 
                   <div className="contenedor-botones-card">
                     <button className="btn-ver-rutina" onClick={() => setSolicitudSeleccionada(alumno)}>
