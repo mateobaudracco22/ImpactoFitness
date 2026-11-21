@@ -31,7 +31,7 @@ function Info() {
         <div className="info">
             <header className="info-header">
                 <div className="header-titulos">
-                    <h1>Información sobre este gimnasio</h1>
+                    <h1>Información de sobre este gimnasio</h1>
                     <h2>Impacto-Fitness</h2>
                 </div>
                 <div className="header-acciones">
