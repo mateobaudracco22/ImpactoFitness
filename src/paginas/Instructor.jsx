@@ -4,13 +4,12 @@ import "../estilos/instructor.css";
 
 function Instructor() {
   const [instructor, setInstructor] = useState(null);
-  const [alumnosLibres, setAlumnosLibres] = useState([]);
+  const [solicitudesPendientes, setSolicitudesPendientes] = useState([]);
   const [misAlumnos, setMisAlumnos] = useState([]);
   const [ejerciciosDisponibles, setEjerciciosDisponibles] = useState([]);
 
   // Estados de control de UI
   const [etiquetaFiltro, setEtiquetaFiltro] = useState("TODOS");
-  const [menuLateralAbierto, setMenuLateralAbierto] = useState(false);
   const [modalEjerciciosAbierto, setModalEjerciciosAbierto] = useState(false);
 
   // Estado para armar/editar rutina
@@ -37,6 +36,22 @@ function Instructor() {
     }
   }, []);
 
+  // Revisa cada 10 segundos si llegaron solicitudes nuevas (actualiza el numerito)
+  useEffect(() => {
+    const intervalo = setInterval(async () => {
+      try {
+        const res = await fetch("http://localhost:3000/api/solicitudes-rutina");
+        const datos = await res.json();
+        if (Array.isArray(datos)) setSolicitudesPendientes(datos);
+      } catch (err) {
+        console.error("Error al actualizar solicitudes:", err);
+      }
+    }, 10000);
+
+    // Al salir de la página se detiene la revisión
+    return () => clearInterval(intervalo);
+  }, []);
+
   const cerrarSesion = () => {
     localStorage.removeItem("usuario");
     window.location.href = "/";
@@ -45,7 +60,7 @@ function Instructor() {
   const cargarDatos = async (instructorId) => {
     try {
       const [resSolicitudes, resMisAlumnos, resEjercicios] = await Promise.all([
-        fetch("http://localhost:3000/api/solicitudes"),
+        fetch("http://localhost:3000/api/solicitudes-rutina"),
         fetch(`http://localhost:3000/api/instructores/${instructorId}/alumnos`),
         fetch("http://localhost:3000/api/ejercicios")
       ]);
@@ -53,29 +68,11 @@ function Instructor() {
       const datosMisAlumnos = await resMisAlumnos.json();
       const datosEjercicios = await resEjercicios.json();
 
-      setAlumnosLibres(datosSolicitudes);
+      setSolicitudesPendientes(datosSolicitudes);
       setMisAlumnos(datosMisAlumnos);
       setEjerciciosDisponibles(datosEjercicios);
     } catch (err) {
       console.error("Error al cargar datos:", err);
-    }
-  };
-
-  const tomarAlumno = async (usuarioId) => {
-    if (!instructor) return;
-    try {
-      const res = await fetch(`http://localhost:3000/api/alumnos/${usuarioId}/asignar`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ instructor_id: instructor.id })
-      });
-      if (res.ok) {
-        alert("¡Alumno asignado correctamente!");
-        cargarDatos(instructor.id);
-        setMenuLateralAbierto(false);
-      }
-    } catch (err) {
-      alert("Error al asignar alumno.");
     }
   };
 
@@ -182,35 +179,6 @@ function Instructor() {
 
   return (
     <div className="instructor-container">
-      <button type="button" className="btn-flotante-izquierda" onClick={() => setMenuLateralAbierto(true)}>
-        📌 <span className="badge-contador">{alumnosLibres.length}</span>
-      </button>
-
-      {menuLateralAbierto && (
-        <div className="drawer-overlay" onClick={() => setMenuLateralAbierto(false)}>
-          <div className="drawer-contenido" onClick={(e) => e.stopPropagation()}>
-            <div className="encabezado-modal">
-              <h3>📌 Alumnos Sin Asignar ({alumnosLibres.length})</h3>
-              <button className="btn-cerrar-modal" onClick={() => setMenuLateralAbierto(false)}>✖</button>
-            </div>
-            <div className="alumnos-list contenedor-alumnos-mini">
-              {alumnosLibres.map((al) => (
-                <div key={al.id || al.usuario_id} className="alumno-card-mini">
-                  <h4>{al.nombre_completo}</h4>
-                  <div className="badge-meta-alumno">
-                    <span>{al.meta_icono || "🎯"}</span>
-                    <span className="texto-meta-alumno">{al.meta_nombre || "General"}</span>
-                  </div>
-                  <button className="btn-ver-rutina" onClick={() => tomarAlumno(al.id || al.usuario_id)}>
-                    🤝 Tomar Alumno
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
       <div className="instructor-content">
         <header className="header-card header-instructor-personalizado">
           <div>
@@ -220,6 +188,9 @@ function Instructor() {
           <div className="acciones-header">
             <button className="btn-notificacion" onClick={() => navigate("/notificacion_ins")}>
               📩 Ver solicitudes
+              {solicitudesPendientes.length > 0 && (
+                <span className="badge-solicitudes">{solicitudesPendientes.length}</span>
+              )}
             </button>
             <button className="btn-cerrar-sesion" onClick={cerrarSesion}>
               Cerrar Sesión 🚪
@@ -229,7 +200,7 @@ function Instructor() {
 
         <section className="metrics-grid">
           <div className="metric-card"><span className="metric-number">{misAlumnos.length}</span><span className="metric-label">Mis Alumnos</span></div>
-          <div className="metric-card"><span className="metric-number">{alumnosLibres.length}</span><span className="metric-label">Pendientes</span></div>
+          <div className="metric-card"><span className="metric-number">{solicitudesPendientes.length}</span><span className="metric-label">Pendientes</span></div>
         </section>
 
         <main>
