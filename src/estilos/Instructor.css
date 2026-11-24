@@ -543,3 +543,10 @@
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.18); }
 }
+
+/* Detalles de cada solicitud aceptada */
+.solicitud-detalle {
+  margin: 8px 0 0;
+  font-size: 0.85rem;
+  color: var(--texto-gris);
+}

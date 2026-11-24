@@ -516,6 +516,26 @@ app.get('/api/usuarios/:id/rol', async (req, res) => {
     }
 });
 
+// Solicitudes de rutina ya aceptadas por los alumnos de un instructor
+app.get('/api/instructores/:instructor_id/solicitudes-aceptadas', async (req, res) => {
+    const { instructor_id } = req.params;
+    try {
+        const [solicitudes] = await db.query(`
+            SELECT s.id, s.usuario_id, u.nombre_completo,
+                   m.nombre AS meta_nombre, m.icono AS meta_icono,
+                   s.nivel, s.dias_por_semana, s.observaciones, s.fecha
+            FROM Solicitudes_Rutina s
+            JOIN Usuarios u ON s.usuario_id = u.id
+            JOIN metas m ON s.meta_id = m.id
+            WHERE u.instructor_id = ? AND s.estado = 'atendida'
+            ORDER BY s.fecha DESC
+        `, [instructor_id]);
+        res.json(solicitudes);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 app.get('/api/instructores/:instructor_id/alumnos', async (req, res) => {
     const { instructor_id } = req.params;
     try {

@@ -5,6 +5,7 @@ import "../estilos/instructor.css";
 function Instructor() {
   const [instructor, setInstructor] = useState(null);
   const [solicitudesPendientes, setSolicitudesPendientes] = useState([]);
+  const [solicitudesAceptadas, setSolicitudesAceptadas] = useState([]);
   const [misAlumnos, setMisAlumnos] = useState([]);
   const [ejerciciosDisponibles, setEjerciciosDisponibles] = useState([]);
 
@@ -57,7 +58,19 @@ function Instructor() {
     window.location.href = "/";
   };
 
+  // Trae las solicitudes que el instructor ya aceptó (con nivel, días y observaciones)
+  const cargarSolicitudesAceptadas = async (instructorId) => {
+    try {
+      const res = await fetch(`http://localhost:3000/api/instructores/${instructorId}/solicitudes-aceptadas`);
+      const datos = await res.json();
+      setSolicitudesAceptadas(Array.isArray(datos) ? datos : []);
+    } catch (err) {
+      console.error("Error al cargar solicitudes aceptadas:", err);
+    }
+  };
+
   const cargarDatos = async (instructorId) => {
+    cargarSolicitudesAceptadas(instructorId);
     try {
       const [resSolicitudes, resMisAlumnos, resEjercicios] = await Promise.all([
         fetch("http://localhost:3000/api/solicitudes-rutina"),
@@ -230,6 +243,42 @@ function Instructor() {
                 </div>
               );
             })}
+          </div>
+
+          {/* SOLICITUDES ACEPTADAS (cada solicitud aceptada queda cargada acá) */}
+          <h2 className="section-title">📋 Solicitudes Aceptadas</h2>
+          <div className="alumnos-list">
+            {solicitudesAceptadas.length === 0 && (
+              <p className="texto-vacio">Todavía no aceptaste ninguna solicitud.</p>
+            )}
+            {solicitudesAceptadas.map((sol) => (
+              <div key={sol.id} className="alumno-card">
+                <div>
+                  <h3 className="alumno-nombre">{sol.nombre_completo}</h3>
+                  <div className="badge-meta-alumno">
+                    <span>{sol.meta_icono || "🎯"}</span>
+                    <span className="texto-meta-alumno">{sol.meta_nombre || "General"}</span>
+                  </div>
+                  <p className="solicitud-detalle">📊 Nivel: {sol.nivel} · 📅 {sol.dias_por_semana} días por semana</p>
+                  <p className="solicitud-detalle">📝 {sol.observaciones || "Sin observaciones"}</p>
+                  <p className="solicitud-detalle">🕒 {new Date(sol.fecha).toLocaleDateString("es-AR")}</p>
+                </div>
+
+                <div className="contenedor-botones-card">
+                  <button
+                    className="btn-ver-rutina"
+                    onClick={() => setSolicitudSeleccionada({
+                      id: sol.usuario_id,
+                      usuario_id: sol.usuario_id,
+                      nombre_completo: sol.nombre_completo,
+                      meta_nombre: sol.meta_nombre
+                    })}
+                  >
+                    ➕ Armar Rutina
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
 
           {/* MODAL ARMADO / EDICIÓN DE RUTINA */}
