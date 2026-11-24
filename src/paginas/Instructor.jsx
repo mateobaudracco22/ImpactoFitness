@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "../estilos/instructor.css";
+
+const DIAS_SEMANA = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo"];
 
 function Instructor() {
   const [instructor, setInstructor] = useState(null);
@@ -26,7 +28,30 @@ function Instructor() {
   const [rutinaAlumno, setRutinaAlumno] = useState([]);
   const [cargandoRutina, setCargandoRutina] = useState(false);
 
+  // Rutinas que el alumno seleccionado ya tiene cargadas (sirve para bloquear sus días)
+  const [rutinasDelAlumno, setRutinasDelAlumno] = useState([]);
+
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // ----- Datos que se calculan a partir del alumno seleccionado -----
+  const idAlumnoModal = solicitudSeleccionada
+    ? (solicitudSeleccionada.usuario_id || solicitudSeleccionada.id)
+    : null;
+
+  // Lo que pidió el alumno: viene en la solicitud, o se busca su última solicitud aceptada
+  const detalleSolicitud = solicitudSeleccionada
+    ? (solicitudSeleccionada.nivel
+        ? solicitudSeleccionada
+        : solicitudesAceptadas.find((s) => s.usuario_id === idAlumnoModal))
+    : null;
+
+  // Días en los que el alumno ya tiene rutina (al editar, se libera el día de la rutina que se edita)
+  const diasOcupados = rutinasDelAlumno
+    .filter((r) => !(esEdicion && (r.rutina_id || r.id) === idRutinaAEditar))
+    .map((r) => r.dia_asignado);
+
+  const sinDiasLibres = !esEdicion && DIAS_SEMANA.every((d) => diasOcupados.includes(d));
 
   useEffect(() => {
     const usuarioGuardado = localStorage.getItem("usuario");
@@ -36,6 +61,47 @@ function Instructor() {
       cargarDatos(profe.id);
     }
   }, []);
+
+  // Si el instructor viene de aceptar una solicitud, se abre directo el armado de rutina
+  useEffect(() => {
+    const solicitudAceptada = location.state?.solicitudAceptada;
+    if (solicitudAceptada) {
+      setSolicitudSeleccionada(solicitudAceptada);
+      // Se borra el dato para que no se vuelva a abrir al recargar la página
+      navigate("/instructor", { replace: true, state: null });
+    }
+  }, []);
+
+  // Al abrir el armado de rutina, busca las rutinas que el alumno ya tiene (para bloquear sus días)
+  useEffect(() => {
+    if (!solicitudSeleccionada) {
+      setRutinasDelAlumno([]);
+      return;
+    }
+
+    const idUsuario = solicitudSeleccionada.usuario_id || solicitudSeleccionada.id;
+
+    const cargarRutinasDelAlumno = async () => {
+      try {
+        const res = await fetch(`http://localhost:3000/api/rutinas/usuario/${idUsuario}`);
+        const datos = await res.json();
+        setRutinasDelAlumno(Array.isArray(datos) ? datos : []);
+      } catch (err) {
+        console.error("Error al cargar las rutinas del alumno:", err);
+      }
+    };
+
+    cargarRutinasDelAlumno();
+  }, [solicitudSeleccionada]);
+
+  // Si el día elegido ya está ocupado, se pasa al primer día libre
+  useEffect(() => {
+    if (!solicitudSeleccionada || esEdicion) return;
+    if (diasOcupados.includes(diaAsignado)) {
+      const diaLibre = DIAS_SEMANA.find((d) => !diasOcupados.includes(d));
+      setDiaAsignado(diaLibre || "");
+    }
+  }, [rutinasDelAlumno]);
 
   // Revisa cada 10 segundos si llegaron solicitudes nuevas (actualiza el numerito)
   useEffect(() => {
@@ -154,6 +220,12 @@ function Instructor() {
       return;
     }
 
+    // El día elegido no puede estar ocupado por otra rutina del alumno
+    if (!diaAsignado || (!esEdicion && diasOcupados.includes(diaAsignado))) {
+      alert("Ese día ya tiene una rutina para este alumno. Elige otro día.");
+      return;
+    }
+
     const endpoint = esEdicion
       ? `http://localhost:3000/api/rutinas/${idRutinaAEditar}`
       : "http://localhost:3000/api/rutinas";
@@ -267,12 +339,7 @@ function Instructor() {
                 <div className="contenedor-botones-card">
                   <button
                     className="btn-ver-rutina"
-                    onClick={() => setSolicitudSeleccionada({
-                      id: sol.usuario_id,
-                      usuario_id: sol.usuario_id,
-                      nombre_completo: sol.nombre_completo,
-                      meta_nombre: sol.meta_nombre
-                    })}
+                    onClick={() => setSolicitudSeleccionada(sol)}
                   >
                     ➕ Armar Rutina
                   </button>
@@ -290,6 +357,26 @@ function Instructor() {
                   <button className="btn-cerrar-modal" onClick={resetearFormulario}>✖</button>
                 </div>
 
+                {/* DETALLE DE LO QUE PIDIÓ EL ALUMNO EN SU SOLICITUD */}
+                {detalleSolicitud && (
+                  <div className="detalle-solicitud-modal">
+                    <h4 className="titulo-detalle-solicitud">📋 Lo que pidió el alumno</h4>
+                    <div className="grid-detalle-solicitud">
+                      <p><strong>🎯 Meta:</strong> {detalleSolicitud.meta_icono || ""} {detalleSolicitud.meta_nombre || "General"}</p>
+                      <p><strong>📊 Nivel:</strong> {detalleSolicitud.nivel}</p>
+                      <p><strong>📅 Días por semana:</strong> {detalleSolicitud.dias_por_semana}</p>
+                      <p><strong>🕒 Fecha:</strong> {new Date(detalleSolicitud.fecha).toLocaleDateString("es-AR")}</p>
+                    </div>
+                    <p className="observaciones-detalle">
+                      <strong>📝 Observaciones:</strong> {detalleSolicitud.observaciones || "Sin observaciones"}
+                    </p>
+                    <p className="dias-ocupados-detalle">
+                      <strong>Rutinas ya cargadas:</strong> {rutinasDelAlumno.length}
+                      {rutinasDelAlumno.length > 0 && ` (${diasOcupados.length > 0 ? diasOcupados.join(", ") : "ninguna otra"})`}
+                    </p>
+                  </div>
+                )}
+
                 <form onSubmit={guardarRutina} className="formulario-rutina">
                   <div className="grid-dos-columnas">
                     <div className="campo-grupo">
@@ -299,10 +386,16 @@ function Instructor() {
                     <div className="campo-grupo">
                       <label className="etiqueta-input">Día Asignado</label>
                       <select className="select-estilizado" value={diaAsignado} onChange={(e) => setDiaAsignado(e.target.value)}>
-                        {["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo"].map(d => (
-                          <option key={d} value={d}>{d}</option>
+                        {sinDiasLibres && <option value="">Sin días libres</option>}
+                        {DIAS_SEMANA.map(d => (
+                          <option key={d} value={d} disabled={diasOcupados.includes(d)}>
+                            {d}{diasOcupados.includes(d) ? " (ya tiene rutina)" : ""}
+                          </option>
                         ))}
                       </select>
+                      {sinDiasLibres && (
+                        <p className="aviso-sin-dias">Este alumno ya tiene rutina todos los días.</p>
+                      )}
                     </div>
                   </div>
 
@@ -337,7 +430,7 @@ function Instructor() {
                   </div>
 
                   <div className="acciones-formulario">
-                    <button type="submit" className="btn-ver-rutina">{esEdicion ? "Actualizar" : "Guardar y Asignar"}</button>
+                    <button type="submit" className="btn-ver-rutina" disabled={sinDiasLibres}>{esEdicion ? "Actualizar" : "Guardar y Asignar"}</button>
                     <button type="button" className="btn-cancelar" onClick={resetearFormulario}>Cancelar</button>
                   </div>
                 </form>

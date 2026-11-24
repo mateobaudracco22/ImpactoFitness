@@ -46,7 +46,7 @@ function Notificacion_Ins() {
     }
   };
 
-  // Aceptar solicitud y asignar alumno al instructor
+  // Aceptar solicitud, asignar alumno al instructor y llevarlo a armar la rutina
   const aceptarSolicitud = async (solicitud) => {
     if (!instructor) return;
 
@@ -75,10 +75,8 @@ function Notificacion_Ins() {
         throw new Error("No se pudo aceptar la solicitud");
       }
 
-      alert("¡Solicitud aceptada correctamente!");
-
-      // Actualizar la lista
-      cargarSolicitudes();
+      // Lleva al instructor directo al panel, con el armado de rutina abierto
+      navigate("/instructor", { state: { solicitudAceptada: solicitud } });
 
     } catch (error) {
       console.error("Error al aceptar:", error);

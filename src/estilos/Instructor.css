@@ -550,3 +550,57 @@
   font-size: 0.85rem;
   color: var(--texto-gris);
 }
+
+/* Detalle de la solicitud dentro del armado de rutina */
+.detalle-solicitud-modal {
+  background: rgba(255, 152, 0, 0.08);
+  border: 1px solid rgba(255, 152, 0, 0.4);
+  border-left: 4px solid var(--acento-principal);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 18px;
+  text-align: left;
+}
+
+.titulo-detalle-solicitud {
+  margin: 0 0 10px;
+  color: var(--detalle-brillo);
+  font-size: 1rem;
+}
+
+.grid-detalle-solicitud {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 6px 16px;
+}
+
+.grid-detalle-solicitud p,
+.observaciones-detalle,
+.dias-ocupados-detalle {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--texto-blanco);
+}
+
+.observaciones-detalle {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 152, 0, 0.25);
+}
+
+.dias-ocupados-detalle {
+  margin-top: 8px;
+  color: var(--detalle-brillo);
+}
+
+.aviso-sin-dias {
+  margin: 6px 0 0;
+  font-size: 0.85rem;
+  color: #ff5252;
+}
+
+.btn-ver-rutina:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
