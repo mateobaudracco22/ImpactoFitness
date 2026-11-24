@@ -39,11 +39,11 @@ function App() {
             }
           />
 
-          {/* Cualquier usuario con sesión iniciada */}
+          {/* Solo clientes (el instructor no puede entrar como usuario) */}
           <Route
             path="/usuarios"
             element={
-              <RutaProtegida>
+              <RutaProtegida rolesPermitidos={["cliente", "admin"]}>
                 <Usuarios />
               </RutaProtegida>
             }
@@ -51,7 +51,7 @@ function App() {
           <Route
             path="/Solicitud_Rutina"
             element={
-              <RutaProtegida>
+              <RutaProtegida rolesPermitidos={["cliente", "admin"]}>
                 <SolicitudRutina />
               </RutaProtegida>
             }
